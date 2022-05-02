@@ -1,4 +1,4 @@
-package com.golovkin.utils.git;
+package com.golovkin.utils.git.log;
 
 import java.time.LocalDateTime;
 
