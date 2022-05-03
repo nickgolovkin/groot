@@ -1,15 +1,16 @@
-package com.golovkin.git.commands;
+package com.golovkin.git.commands.newbranch;
 
 import com.golovkin.git.Git;
+import com.golovkin.git.commands.AbstractGitCommand;
 import com.golovkin.git.exceptions.BranchAlreadyExistsException;
 
-public class NewBranchGitCommand extends AbstractGitCommand<NewBranchCommandInput> {
+public class NewBranchGitCommand extends AbstractGitCommand<NewBranchGitCommandInput> {
     public NewBranchGitCommand(Git git) {
         super(git);
     }
 
     @Override
-    protected void performCommand(NewBranchCommandInput commandInput) {
+    protected void performCommand(NewBranchGitCommandInput commandInput) {
         String projectDirectoryPath = commandInput.getProjectDirectoryPath();
         String name = commandInput.getNewBranchName();
 

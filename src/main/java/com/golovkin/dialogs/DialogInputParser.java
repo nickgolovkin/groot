@@ -2,7 +2,7 @@ package com.golovkin.dialogs;
 
 import java.util.regex.Pattern;
 
-public interface InputParser<Input extends com.golovkin.dialogs.Input> {
+public interface DialogInputParser<Input extends DialogInput> {
     Input parse(String input);
     Pattern getInputPattern();
 }

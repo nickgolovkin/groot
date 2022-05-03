@@ -1,8 +1,8 @@
 package com.golovkin.dialogs.newbranch;
 
-import com.golovkin.dialogs.Input;
+import com.golovkin.dialogs.DialogInput;
 
-public class NewBranchDialogInput implements Input {
+public class NewBranchDialogInput implements DialogInput {
     private String name;
 
     public NewBranchDialogInput(String name) {

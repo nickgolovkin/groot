@@ -3,8 +3,8 @@ package com.golovkin;
 import com.golovkin.config.Configuration;
 import com.golovkin.config.ConfigurationReader;
 import com.golovkin.dialogs.AbstractDialog;
-import com.golovkin.dialogs.DialogSearcher;
-import com.golovkin.dialogs.InputParser;
+import com.golovkin.dialogs.utils.DialogSearcher;
+import com.golovkin.dialogs.DialogInputParser;
 import com.golovkin.dialogs.newbranch.NewBranchDialog;
 import com.golovkin.git.Git;
 
@@ -24,15 +24,12 @@ public class App
 
         Configuration configuration = new ConfigurationReader().readConfiguration();
         Git git = new Git(configuration.getGitBackendPath());
-        // Кажется, что действительно лучше каждую команду сделать отдельным классом
-        // и инициализировать в соответствующем диалоге. Так быстрее будет
-        Branching branching = new Branching(git);
 
         Map<Class<? extends AbstractDialog>, AbstractDialog> dialogs = getDialogs(git, configuration);
         DialogSearcher dialogSearcher = new DialogSearcher(dialogs);
 
         AbstractDialog dialog = dialogSearcher.searchDialog(input);
-        InputParser inputParser = dialog.getInputParser();
+        DialogInputParser inputParser = dialog.getInputParser();
         dialog.start(inputParser.parse(input));
     }
 

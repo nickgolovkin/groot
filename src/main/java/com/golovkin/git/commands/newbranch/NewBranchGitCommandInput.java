@@ -1,12 +1,12 @@
-package com.golovkin.git.commands;
+package com.golovkin.git.commands.newbranch;
 
-import java.nio.file.Path;
+import com.golovkin.git.commands.GitCommandInput;
 
-public class NewBranchCommandInput implements CommandInput {
+public class NewBranchGitCommandInput implements GitCommandInput {
     private final String newBranchName;
     private final String projectDirectoryPath;
 
-    public NewBranchCommandInput(String newBranchName, String projectDirectoryPath) {
+    public NewBranchGitCommandInput(String newBranchName, String projectDirectoryPath) {
         this.newBranchName = newBranchName;
         this.projectDirectoryPath = projectDirectoryPath;
     }

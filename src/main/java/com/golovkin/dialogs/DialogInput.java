@@ -1,4 +1,4 @@
 package com.golovkin.dialogs;
 
-public interface Input {
+public interface DialogInput {
 }

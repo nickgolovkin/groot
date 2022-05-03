@@ -1,4 +1,4 @@
 package com.golovkin.git.commands;
 
-public interface CommandInput {
+public interface GitCommandInput {
 }

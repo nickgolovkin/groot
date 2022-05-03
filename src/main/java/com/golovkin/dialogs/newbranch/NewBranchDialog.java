@@ -1,11 +1,10 @@
 package com.golovkin.dialogs.newbranch;
 
-import com.golovkin.Branching;
 import com.golovkin.config.ProjectEntry;
 import com.golovkin.dialogs.AbstractDialog;
 import com.golovkin.git.Git;
-import com.golovkin.git.commands.NewBranchCommandInput;
-import com.golovkin.git.commands.NewBranchGitCommand;
+import com.golovkin.git.commands.newbranch.NewBranchGitCommandInput;
+import com.golovkin.git.commands.newbranch.NewBranchGitCommand;
 import com.golovkin.git.exceptions.BranchAlreadyExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +30,7 @@ public class NewBranchDialog extends AbstractDialog<NewBranchDialogInput, NewBra
             String projectName = projectEntry.getName();
 
             try {
-                NewBranchCommandInput commandInput = new NewBranchCommandInput(newBranchName, projectEntry.getDirectory());
+                NewBranchGitCommandInput commandInput = new NewBranchGitCommandInput(newBranchName, projectEntry.getDirectory());
                 newBranchGitCommand.execute(commandInput);
                 System.out.printf("[%s] Ветка [%s] успешно создана\n", projectName, newBranchName);
                 LOGGER.info("[{}] Создание ветки [{}]. Ветка успешно создана. Команды - [{}]", projectName, newBranchName, getGit().getLastExecutedCommandsAsString());

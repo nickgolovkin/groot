@@ -1,11 +1,11 @@
 package com.golovkin.dialogs.newbranch;
 
-import com.golovkin.dialogs.InputParser;
+import com.golovkin.dialogs.DialogInputParser;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class NewBranchDialogInputParser implements InputParser<NewBranchDialogInput> {
+public class NewBranchDialogInputParser implements DialogInputParser<NewBranchDialogInput> {
     private static final Pattern INPUT_PATTERN = Pattern.compile("new branch (?<name>.+)");
 
     public NewBranchDialogInput parse(String input) {

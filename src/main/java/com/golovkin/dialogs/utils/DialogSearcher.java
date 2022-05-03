@@ -1,4 +1,6 @@
-package com.golovkin.dialogs;
+package com.golovkin.dialogs.utils;
+
+import com.golovkin.dialogs.AbstractDialog;
 
 import java.util.Map;
 import java.util.regex.Pattern;

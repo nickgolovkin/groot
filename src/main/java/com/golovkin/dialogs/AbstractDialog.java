@@ -5,7 +5,7 @@ import com.golovkin.git.Git;
 
 import java.util.List;
 
-public abstract class AbstractDialog<Input extends com.golovkin.dialogs.Input, InputParser extends com.golovkin.dialogs.InputParser<Input>> {
+public abstract class AbstractDialog<Input extends DialogInput, InputParser extends DialogInputParser<Input>> {
     private final List<ProjectEntry> projectEntries;
     private final Git git;
 
