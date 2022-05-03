@@ -27,6 +27,7 @@ public class GitExec {
             process = Runtime.getRuntime().exec(consoleCommand);
 
             if (!process.waitFor(1, TimeUnit.SECONDS)) {
+                process.destroyForcibly();
                 throw new TimeoutException(String.format("Время ожидания выполнения команды [%s] вышло", command));
             }
         } catch (InterruptedException | IOException e) {
