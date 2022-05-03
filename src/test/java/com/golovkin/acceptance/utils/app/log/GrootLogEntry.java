@@ -30,4 +30,9 @@ public class GrootLogEntry {
     public String getMessage() {
         return message;
     }
+
+    @Override
+    public String toString() {
+        return String.format("[%s] %s %s", logLevel, dateTime, message);
+    }
 }

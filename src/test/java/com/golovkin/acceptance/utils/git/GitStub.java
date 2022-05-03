@@ -14,9 +14,10 @@ public class GitStub {
     private final GitStubConfigBuilder gitStubConfigBuilder;
     private final GitStubLogReader gitStubLogReader;
     private boolean isGitStubCreated;
+    private final Path gitStubDir;
 
     public GitStub(Path testInstanceDir) {
-        Path gitStubDir = testInstanceDir.resolve("git-stub");
+        gitStubDir = testInstanceDir.resolve("git-stub");
 
         try {
             Files.createDirectory(gitStubDir);
@@ -49,6 +50,10 @@ public class GitStub {
         return readLogs().stream()
                 .map(GitStubLogEntry::getRequest)
                 .collect(Collectors.toList());
+    }
+
+    public Path getGitStubDirectoryPath() {
+        return gitStubDir;
     }
 
     public Path getConfigPath() {

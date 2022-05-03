@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class GitStubLogReader {
     private static final Path LOG_FILE_NAME = Paths.get("logs.log");
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-    private static final Pattern LOG_ENTRY_PATTERN = Pattern.compile("^\\[.+] (?<dateTime>.+) - Запрос - \\[(?<request>.+)], ответ - \\[(?<response>.+)], код ответа - \\[(?<exitCode>.+)]$");
+    private static final Pattern LOG_ENTRY_PATTERN = Pattern.compile("^\\[.+] (?<dateTime>.+) - Запрос - \\[(?<request>.+)], ответ - \\[(?<response>.*)], код ответа - \\[(?<exitCode>.+)]$");
 
     private final Path path;
 

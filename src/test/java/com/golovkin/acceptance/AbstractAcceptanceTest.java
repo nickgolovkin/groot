@@ -30,7 +30,7 @@ public abstract class AbstractAcceptanceTest {
         // для всех расширений (либо просто сделай абстрактный класс, куда вынесешь это всё и всё)
         this.gitStub = new GitStub(tempDir);
         this.groot = new Groot(tempDir);
-        this.groot.withGitBackendPath(PathUtils.getResourcePath("/git-stub/git-stub.jar").toString());
+        this.groot.withGitBackendPath(String.format("java -jar -Dapp.path=%s %s", gitStub.getGitStubDirectoryPath().toString(), PathUtils.getResourcePath("/git-stub/git-stub.jar").toString()));
     }
 
     protected Path tempDir() {
