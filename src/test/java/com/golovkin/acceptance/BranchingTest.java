@@ -330,4 +330,222 @@ public class BranchingTest extends AbstractAcceptanceTest {
             assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
         }
     }
+
+    @DisplayName("abort")
+    @Nested
+    public class Abort {
+        @Test
+        public void successfully_aborted_merge_and_cherry_pick() {
+            gitStub().add("--git-dir omniutils_dir/.git merge --abort", "", 0)
+                    .add("--git-dir omniutils_dir/.git cherry-pick --abort", "error: no cherry-pick or revert in progress\nfatal: cherry-pick failed", 1)
+                    .add("--git-dir omniloan_dir/.git merge --abort", "fatal: There is no merge to abort (MERGE_HEAD missing).", 1)
+                    .add("--git-dir omniloan_dir/.git cherry-pick --abort", "", 0)
+                    .add("--git-dir omniutils_dir/.git status", "On branch sample_branch\nYou have unmerged paths.\n  (fix conflicts and run \"git commit\")\n  (use \"git merge --abort\" to abort the merge)\n\nUnmerged paths:\n  (use \"git add <file>...\" to mark resolution)\n	both modified:   file\n\nno changes added to commit (use \"git add\" and/or \"git commit -a\")", 0)
+                    .add("--git-dir omniloan_dir/.git status", "On branch sample_branch\nYou are currently cherry-picking commit c86117f.\n  (fix conflicts and run \"git cherry-pick --continue\")\n  (use \"git cherry-pick --skip\" to skip this patch)\n  (use \"git cherry-pick --abort\" to cancel the cherry-pick operation)\n\nUnmerged paths:\n  (use \"git add <file>...\" to mark resolution)\n	both modified:   file\n\nno changes added to commit (use \"git add\" and/or \"git commit -a\")", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("abort");
+
+            List<String> expectedOutput = Lists.newArrayList(
+                    "Произвожу отмену мержа/черри-пика",
+                    "[omniutils] Мерж/черри-пик успешно отменен в [sample_branch]",
+                    "[omniloan] Мерж/черри-пик успешно отменен в [sample_branch]",
+                    "Отмена мержа/черри-пика завершена"
+            );
+            List<String> actualOutput = groot().getOutput();
+            assertEquals(expectedOutput, actualOutput);
+
+            List<String> expectedGitRequests = Lists.newArrayList(
+                    "--git-dir omniutils_dir/.git status",
+                    "--git-dir omniutils_dir/.git merge --abort",
+                    "--git-dir omniloan_dir/.git status",
+                    "--git-dir omniloan_dir/.git merge --abort",
+                    "--git-dir omniloan_dir/.git cherry-pick --abort"
+            );
+            List<String> actualGitRequests = gitStub().readRequestsFromLog();
+            assertEquals(expectedGitRequests, actualGitRequests);
+
+            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Отмена мержа/черри-пика в ветке [sample_branch]. Мерж/черри-пик успешно отменен. Команды - [--git-dir omniutils_dir/.git merge --abort]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Отмена мержа/черри-пика в ветке [sample_branch]. Мерж/черри-пик успешно отменен. Команды - [--git-dir omniloan_dir/.git merge --abort;--git-dir omniloan_dir/.git cherry-pick --abort]")
+            );
+            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
+            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
+        }
+
+        @Test
+        public void no_merge_to_abort_in_one_project() {
+            gitStub().add("--git-dir omniutils_dir/.git merge --abort", "fatal: There is no merge to abort (MERGE_HEAD missing).", 1)
+                    .add("--git-dir omniutils_dir/.git cherry-pick --abort", "error: no cherry-pick or revert in progress\nfatal: cherry-pick failed", 1)
+                    .add("--git-dir omniloan_dir/.git merge --abort", "", 0)
+                    .add("--git-dir omniloan_dir/.git cherry-pick --abort", "error: no cherry-pick or revert in progress\nfatal: cherry-pick failed", 1)
+                    .add("--git-dir omniutils_dir/.git status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
+                    .add("--git-dir omniloan_dir/.git status", "On branch sample_branch\nYou have unmerged paths.\n  (fix conflicts and run \"git commit\")\n  (use \"git merge --abort\" to abort the merge)\n\nUnmerged paths:\n  (use \"git add <file>...\" to mark resolution)\n	both modified:   file\n\nno changes added to commit (use \"git add\" and/or \"git commit -a\")", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("abort");
+
+            List<String> expectedOutput = Lists.newArrayList(
+                    "Произвожу отмену мержа/черри-пика",
+                    "[omniutils] Нет мержа/черри-пика для отмены в [sample_branch]",
+                    "[omniloan] Мерж/черри-пик успешно отменен в [sample_branch]",
+                    "Отмена мержа/черри-пика завершена"
+            );
+            List<String> actualOutput = groot().getOutput();
+            assertEquals(expectedOutput, actualOutput);
+
+            List<String> expectedGitRequests = Lists.newArrayList(
+                    "--git-dir omniutils_dir/.git status",
+                    "--git-dir omniutils_dir/.git merge --abort",
+                    "--git-dir omniutils_dir/.git cherry-pick --abort",
+                    "--git-dir omniloan_dir/.git status",
+                    "--git-dir omniloan_dir/.git merge --abort"
+            );
+            List<String> actualGitRequests = gitStub().readRequestsFromLog();
+            assertEquals(expectedGitRequests, actualGitRequests);
+
+            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+                    new GrootLogEntry(LogLevel.WARN, "[omniutils] Отмена мержа/черри-пика в ветке [sample_branch]. Нет мержа/черри-пика для отмены. Команды - [--git-dir omniutils_dir/.git merge --abort;--git-dir omniutils_dir/.git cherry-pick --abort]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Отмена мержа/черри-пика в ветке [sample_branch]. Мерж/черри-пик успешно отменен. Команды - [--git-dir omniloan_dir/.git merge --abort]")
+            );
+            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
+            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
+        }
+
+        @Test
+        public void no_cherry_pick_to_abort_in_one_project() {
+            gitStub().add("--git-dir omniutils_dir/.git merge --abort", "fatal: There is no merge to abort (MERGE_HEAD missing).", 1)
+                    .add("--git-dir omniutils_dir/.git cherry-pick --abort", "error: no cherry-pick or revert in progress\nfatal: cherry-pick failed", 1)
+                    .add("--git-dir omniloan_dir/.git merge --abort", "", 0)
+                    .add("--git-dir omniloan_dir/.git cherry-pick --abort", "error: no cherry-pick or revert in progress\nfatal: cherry-pick failed", 1)
+                    .add("--git-dir omniutils_dir/.git status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
+                    .add("--git-dir omniloan_dir/.git status", "On branch sample_branch\nYou have unmerged paths.\n  (fix conflicts and run \"git commit\")\n  (use \"git merge --abort\" to abort the merge)\n\nUnmerged paths:\n  (use \"git add <file>...\" to mark resolution)\n	both modified:   file\n\nno changes added to commit (use \"git add\" and/or \"git commit -a\")", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("abort");
+
+            List<String> expectedOutput = Lists.newArrayList(
+                    "Произвожу отмену мержа/черри-пика",
+                    "[omniutils] Нет мержа/черри-пика для отмены в [sample_branch]",
+                    "[omniloan] Мерж/черри-пик успешно отменен в [sample_branch]",
+                    "Отмена мержа/черри-пика завершена"
+            );
+            List<String> actualOutput = groot().getOutput();
+            assertEquals(expectedOutput, actualOutput);
+
+            List<String> expectedGitRequests = Lists.newArrayList(
+                    "--git-dir omniutils_dir/.git status",
+                    "--git-dir omniutils_dir/.git merge --abort",
+                    "--git-dir omniutils_dir/.git cherry-pick --abort",
+                    "--git-dir omniloan_dir/.git status",
+                    "--git-dir omniloan_dir/.git merge --abort"
+            );
+            List<String> actualGitRequests = gitStub().readRequestsFromLog();
+            assertEquals(expectedGitRequests, actualGitRequests);
+
+            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+                    new GrootLogEntry(LogLevel.WARN, "[omniutils] Отмена мержа/черри-пика в ветке [sample_branch]. Нет мержа/черри-пика для отмены. Команды - [--git-dir omniutils_dir/.git merge --abort;--git-dir omniutils_dir/.git cherry-pick --abort]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Отмена мержа/черри-пика в ветке [sample_branch]. Мерж/черри-пик успешно отменен. Команды - [--git-dir omniloan_dir/.git merge --abort]")
+            );
+            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
+            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
+        }
+
+        @Test
+        public void cannot_abort_merge_in_one_project() {
+            gitStub().add("--git-dir omniutils_dir/.git merge --abort", "some unexpected\nerror", 1)
+                    .add("--git-dir omniutils_dir/.git cherry-pick --abort", "error: no cherry-pick or revert in progress\nfatal: cherry-pick failed", 1)
+                    .add("--git-dir omniloan_dir/.git merge --abort", "", 0)
+                    .add("--git-dir omniloan_dir/.git cherry-pick --abort", "error: no cherry-pick or revert in progress\nfatal: cherry-pick failed", 1)
+                    .add("--git-dir omniutils_dir/.git status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
+                    .add("--git-dir omniloan_dir/.git status", "On branch sample_branch\nYou have unmerged paths.\n  (fix conflicts and run \"git commit\")\n  (use \"git merge --abort\" to abort the merge)\n\nUnmerged paths:\n  (use \"git add <file>...\" to mark resolution)\n	both modified:   file\n\nno changes added to commit (use \"git add\" and/or \"git commit -a\")", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("abort");
+
+            List<String> expectedOutput = Lists.newArrayList(
+                    "Произвожу отмену мержа/черри-пика",
+                    "[omniutils] Не удалось отменить мерж/черри-пик в [sample_branch]",
+                    "[omniloan] Мерж/черри-пик успешно отменен в [sample_branch]",
+                    "Отмена мержа/черри-пика завершена"
+            );
+            List<String> actualOutput = groot().getOutput();
+            assertEquals(expectedOutput, actualOutput);
+
+            List<String> expectedGitRequests = Lists.newArrayList(
+                    "--git-dir omniutils_dir/.git status",
+                    "--git-dir omniutils_dir/.git merge --abort",
+                    "--git-dir omniloan_dir/.git status",
+                    "--git-dir omniloan_dir/.git merge --abort"
+            );
+            List<String> actualGitRequests = gitStub().readRequestsFromLog();
+            assertEquals(expectedGitRequests, actualGitRequests);
+
+            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Отмена мержа/черри-пика в ветке [sample_branch]. Не удалось отменить мерж/черри-пик. Команды - [--git-dir omniutils_dir/.git merge --abort]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Отмена мержа/черри-пика в ветке [sample_branch]. Мерж/черри-пик успешно отменен. Команды - [--git-dir omniloan_dir/.git merge --abort]")
+            );
+            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
+            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
+        }
+
+        @Test
+        public void cannot_abort_cherry_pick_in_one_project() {
+            gitStub().add("--git-dir omniutils_dir/.git merge --abort", "fatal: There is no merge to abort (MERGE_HEAD missing).", 1)
+                    .add("--git-dir omniutils_dir/.git cherry-pick --abort", "some unexpected\nerror", 1)
+                    .add("--git-dir omniloan_dir/.git merge --abort", "", 0)
+                    .add("--git-dir omniloan_dir/.git cherry-pick --abort", "error: no cherry-pick or revert in progress\nfatal: cherry-pick failed", 1)
+                    .add("--git-dir omniutils_dir/.git status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
+                    .add("--git-dir omniloan_dir/.git status", "On branch sample_branch\nYou have unmerged paths.\n  (fix conflicts and run \"git commit\")\n  (use \"git merge --abort\" to abort the merge)\n\nUnmerged paths:\n  (use \"git add <file>...\" to mark resolution)\n	both modified:   file\n\nno changes added to commit (use \"git add\" and/or \"git commit -a\")", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("abort");
+
+            List<String> expectedOutput = Lists.newArrayList(
+                    "Произвожу отмену мержа/черри-пика",
+                    "[omniutils] Не удалось отменить мерж/черри-пик в [sample_branch]",
+                    "[omniloan] Мерж/черри-пик успешно отменен в [sample_branch]",
+                    "Отмена мержа/черри-пика завершена"
+            );
+            List<String> actualOutput = groot().getOutput();
+            assertEquals(expectedOutput, actualOutput);
+
+            List<String> expectedGitRequests = Lists.newArrayList(
+                    "--git-dir omniutils_dir/.git status",
+                    "--git-dir omniutils_dir/.git merge --abort",
+                    "--git-dir omniutils_dir/.git cherry-pick --abort",
+                    "--git-dir omniloan_dir/.git status",
+                    "--git-dir omniloan_dir/.git merge --abort"
+            );
+            List<String> actualGitRequests = gitStub().readRequestsFromLog();
+            assertEquals(expectedGitRequests, actualGitRequests);
+
+            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Отмена мержа/черри-пика в ветке [sample_branch]. Не удалось отменить мерж/черри-пик. Команды - [--git-dir omniutils_dir/.git merge --abort;--git-dir omniutils_dir/.git cherry-pick --abort]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Отмена мержа/черри-пика в ветке [sample_branch]. Мерж/черри-пик успешно отменен. Команды - [--git-dir omniloan_dir/.git merge --abort]")
+            );
+            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
+            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
+        }
+    }
 }

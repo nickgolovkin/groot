@@ -20,7 +20,7 @@ public class Git {
     }
 
     public void createBranch(String projectDirectoryPath, String name) {
-        gitExec.run(String.format("--git-dir %s/.git branch %s", projectDirectoryPath, name));
+        gitExec.run(String.format("--git-dir %s/.git branch %s", escapePath(projectDirectoryPath), name));
 
         if (gitExec.getExitCode() != 0) {
             List<String> output = gitExec.getOutput();
@@ -35,7 +35,7 @@ public class Git {
     }
 
     public void deleteBranch(String projectDirectoryPath, String name) {
-        gitExec.run(String.format("--git-dir %s/.git branch -D %s", projectDirectoryPath, name));
+        gitExec.run(String.format("--git-dir %s/.git branch -D %s", escapePath(projectDirectoryPath), name));
 
         if (gitExec.getExitCode() != 0) {
             List<String> output = gitExec.getOutput();
@@ -50,7 +50,7 @@ public class Git {
     }
 
     public void renameBranch(String projectDirectoryPath, String name) {
-        gitExec.run(String.format("--git-dir %s/.git branch -M %s", projectDirectoryPath, name));
+        gitExec.run(String.format("--git-dir %s/.git branch -M %s", escapePath(projectDirectoryPath), name));
 
         if (gitExec.getExitCode() != 0) {
             List<String> output = gitExec.getOutput();
@@ -60,7 +60,7 @@ public class Git {
     }
 
     public String status(String projectDirectoryPath) {
-        gitExec.run(String.format("--git-dir %s/.git status", projectDirectoryPath));
+        gitExec.run(String.format("--git-dir %s/.git status", escapePath(projectDirectoryPath)));
 
         List<String> output = gitExec.getOutput();
         if (gitExec.getExitCode() != 0) {
@@ -71,7 +71,7 @@ public class Git {
     }
 
     public void checkout(String projectDirectoryPath, String name) {
-        gitExec.run(String.format("--git-dir %s/.git checkout %s", projectDirectoryPath, name));
+        gitExec.run(String.format("--git-dir %s/.git checkout %s", escapePath(projectDirectoryPath), name));
 
         if (gitExec.getExitCode() != 0) {
             List<String> output = gitExec.getOutput();
@@ -89,5 +89,9 @@ public class Git {
 
     public void resetLastExecutedCommands() {
         gitExec.resetLastExecutedCommands();
+    }
+
+    private String escapePath(String path) {
+        return path.replace(" ", "\\ ");
     }
 }
