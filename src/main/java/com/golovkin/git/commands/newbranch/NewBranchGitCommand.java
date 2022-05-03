@@ -12,10 +12,10 @@ public class NewBranchGitCommand extends AbstractGitCommand<NewBranchGitCommandI
     @Override
     protected void performCommand(NewBranchGitCommandInput commandInput) {
         String projectDirectoryPath = commandInput.getProjectDirectoryPath();
-        String name = commandInput.getNewBranchName();
+        String name = commandInput.getBranchName();
 
         try {
-            getGit().branch(projectDirectoryPath, name);
+            getGit().createBranch(projectDirectoryPath, name);
             getGit().checkout(projectDirectoryPath, name);
         } catch (BranchAlreadyExistsException e) {
             getGit().checkout(projectDirectoryPath, name);

@@ -165,8 +165,8 @@ public class BranchingTest extends AbstractAcceptanceTest {
             assertEquals(expectedGitRequests, actualGitRequests);
 
             List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
-                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Удаление ветки [sample_branch]. Ветка успешно удалена. Команды - [--git-dir \"omniutils_dir/.git\" branch -D sample_branch"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Удаление ветки [sample_branch]. Ветка успешно удалена. Команды - [--git-dir \"omniloan_dir/.git\" branch -D sample_branch")
+                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Удаление ветки [sample_branch]. Ветка успешно удалена. Команды - [--git-dir \"omniutils_dir/.git\" branch -D sample_branch]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Удаление ветки [sample_branch]. Ветка успешно удалена. Команды - [--git-dir \"omniloan_dir/.git\" branch -D sample_branch]")
             );
             List<GrootLogEntry> actualGrootLogs = groot().readLogs();
             assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
@@ -201,8 +201,8 @@ public class BranchingTest extends AbstractAcceptanceTest {
             assertEquals(expectedGitRequests, actualGitRequests);
 
             List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
-                    new GrootLogEntry(LogLevel.WARN, "[omniutils] Удаление ветки [sample_branch]. Ветка не существует. Команды - [--git-dir \"omniutils_dir/.git\" branch -D sample_branch"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Удаление ветки [sample_branch]. Ветка успешно удалена. Команды - [--git-dir \"omniloan_dir/.git\" branch -D sample_branch")
+                    new GrootLogEntry(LogLevel.WARN, "[omniutils] Удаление ветки [sample_branch]. Ветка не существует. Команды - [--git-dir \"omniutils_dir/.git\" branch -D sample_branch]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Удаление ветки [sample_branch]. Ветка успешно удалена. Команды - [--git-dir \"omniloan_dir/.git\" branch -D sample_branch]")
             );
             List<GrootLogEntry> actualGrootLogs = groot().readLogs();
             assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
@@ -237,8 +237,8 @@ public class BranchingTest extends AbstractAcceptanceTest {
             assertEquals(expectedGitRequests, actualGitRequests);
 
             List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
-                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Удаление ветки [sample_branch]. Не удалось удалить ветку. Причина ошибки - [error: Cannot delete branch '$1' checked out at '/home/nikita/Documents/git_test']. Команды - [--git-dir \"omniutils_dir/.git\" branch -D sample_branch"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Удаление ветки [sample_branch]. Ветка успешно удалена. Команды - [--git-dir \"omniloan_dir/.git\" branch -D sample_branch")
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Удаление ветки [sample_branch]. Не удалось удалить ветку. Причина ошибки - [error: Cannot delete branch 'sample_branch' checked out at '/home/nikita/Documents/git_test']. Команды - [--git-dir \"omniutils_dir/.git\" branch -D sample_branch]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Удаление ветки [sample_branch]. Ветка успешно удалена. Команды - [--git-dir \"omniloan_dir/.git\" branch -D sample_branch]")
             );
             List<GrootLogEntry> actualGrootLogs = groot().readLogs();
             assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);

@@ -1,12 +1,12 @@
-package com.golovkin.git.commands.newbranch;
+package com.golovkin.git.commands.deletebranch;
 
 import com.golovkin.git.commands.GitCommandInput;
 
-public class NewBranchGitCommandInput implements GitCommandInput {
+public class DeleteBranchGitCommandInput implements GitCommandInput {
     private final String branchName;
     private final String projectDirectoryPath;
 
-    public NewBranchGitCommandInput(String branchName, String projectDirectoryPath) {
+    public DeleteBranchGitCommandInput(String branchName, String projectDirectoryPath) {
         this.branchName = branchName;
         this.projectDirectoryPath = projectDirectoryPath;
     }
