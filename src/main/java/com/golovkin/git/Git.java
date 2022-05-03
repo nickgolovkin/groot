@@ -49,6 +49,27 @@ public class Git {
         }
     }
 
+    public void renameBranch(String projectDirectoryPath, String name) {
+        gitExec.run(String.format("--git-dir \"%s/.git\" branch -M %s", projectDirectoryPath, name));
+
+        if (gitExec.getExitCode() != 0) {
+            List<String> output = gitExec.getOutput();
+
+            throw new GitException(output);
+        }
+    }
+
+    public String status(String projectDirectoryPath) {
+        gitExec.run(String.format("--git-dir \"%s/.git\" status", projectDirectoryPath));
+
+        List<String> output = gitExec.getOutput();
+        if (gitExec.getExitCode() != 0) {
+            throw new GitException(output);
+        }
+
+        return String.join(" ", output);
+    }
+
     public void checkout(String projectDirectoryPath, String name) {
         gitExec.run(String.format("--git-dir \"%s/.git\" checkout %s", projectDirectoryPath, name));
 

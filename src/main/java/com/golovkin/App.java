@@ -4,6 +4,7 @@ import com.golovkin.config.Configuration;
 import com.golovkin.config.ConfigurationReader;
 import com.golovkin.dialogs.AbstractDialog;
 import com.golovkin.dialogs.deletebranch.DeleteBranchDialog;
+import com.golovkin.dialogs.renamebranch.RenameBranchDialog;
 import com.golovkin.dialogs.utils.DialogSearcher;
 import com.golovkin.dialogs.DialogInputParser;
 import com.golovkin.dialogs.newbranch.NewBranchDialog;
@@ -40,6 +41,7 @@ public class App
 
         abstractDialogs.put(NewBranchDialog.class, new NewBranchDialog(git, configuration.getProjectEntries()));
         abstractDialogs.put(DeleteBranchDialog.class, new DeleteBranchDialog(git, configuration.getProjectEntries()));
+        abstractDialogs.put(RenameBranchDialog.class, new RenameBranchDialog(git, configuration.getProjectEntries()));
 
         return abstractDialogs;
     }
