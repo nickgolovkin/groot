@@ -1,11 +1,13 @@
-package com.golovkin.utils;
+package com.golovkin.acceptance;
 
-import com.golovkin.utils.git.GitStub;
+import com.golovkin.acceptance.utils.PathUtils;
+import com.golovkin.acceptance.utils.app.Groot;
+import com.golovkin.acceptance.utils.app.config.GrootConfigBuilder;
+import com.golovkin.acceptance.utils.git.GitStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public abstract class AbstractIntegrationTest {
@@ -13,6 +15,7 @@ public abstract class AbstractIntegrationTest {
     private Path tempDir;
 
     private GitStub gitStub;
+    private Groot groot;
 
     @BeforeEach
     public void init() throws IOException {
@@ -23,11 +26,9 @@ public abstract class AbstractIntegrationTest {
 
         // Наличие временной директории - это деталь реализации, ты не должен о ней задумываться, поэтому нужно как-то сделать ее общей
         // для всех расширений (либо просто сделай абстрактный класс, куда вынесешь это всё и всё)
-
-        Path directory = tempDir.resolve("git-stub");
-        Files.createDirectory(directory);
-
-        this.gitStub = new GitStub(directory);
+        this.gitStub = new GitStub(tempDir);
+        this.groot = new Groot(tempDir);
+        this.groot.withGitBackendPath(PathUtils.getResourcePath("/git-stub/git-stub.jar").toString());
     }
 
     protected Path tempDir() {
@@ -36,5 +37,9 @@ public abstract class AbstractIntegrationTest {
 
     protected GitStub gitStub() {
         return gitStub;
+    }
+
+    protected Groot groot() {
+        return groot;
     }
 }

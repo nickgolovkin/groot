@@ -1,4 +1,4 @@
-package com.golovkin.utils.git.log;
+package com.golovkin.acceptance.utils.git.log;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,7 +15,7 @@ public class GitStubLogReader {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private static final Pattern LOG_ENTRY_PATTERN = Pattern.compile("^\\[.+] (?<dateTime>.+) - Запрос - \\[(?<request>.+)], ответ - \\[(?<response>.+)], код ответа - \\[(?<exitCode>.+)]$");
 
-    private Path path;
+    private final Path path;
 
     public GitStubLogReader(Path path) {
         this.path = path;
@@ -27,13 +27,17 @@ public class GitStubLogReader {
         try {
             List<String> lines = Files.readAllLines(logPath);
 
-            return lines.stream()
-                    .filter(x -> !x.isEmpty())
-                    .map(this::parseLine)
-                    .collect(Collectors.toList());
+            return parseLines(lines);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private List<GitStubLogEntry> parseLines(List<String> lines) {
+        return lines.stream()
+                .filter(this::isNotEmpty)
+                .map(this::parseLine)
+                .collect(Collectors.toList());
     }
 
     private GitStubLogEntry parseLine(String line) {
@@ -46,5 +50,9 @@ public class GitStubLogReader {
         int exitCode = Integer.parseInt(matcher.group("exitCode"));
 
         return new GitStubLogEntry(dateTime, request, response, exitCode);
+    }
+
+    private boolean isNotEmpty(String string) {
+        return !string.isEmpty();
     }
 }

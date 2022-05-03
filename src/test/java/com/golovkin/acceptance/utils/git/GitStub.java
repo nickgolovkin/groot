@@ -1,9 +1,11 @@
-package com.golovkin.utils.git;
+package com.golovkin.acceptance.utils.git;
 
-import com.golovkin.utils.git.config.GitStubConfigBuilder;
-import com.golovkin.utils.git.log.GitStubLogEntry;
-import com.golovkin.utils.git.log.GitStubLogReader;
+import com.golovkin.acceptance.utils.git.config.GitStubConfigBuilder;
+import com.golovkin.acceptance.utils.git.log.GitStubLogEntry;
+import com.golovkin.acceptance.utils.git.log.GitStubLogReader;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -12,9 +14,17 @@ public class GitStub {
     private final GitStubLogReader gitStubLogReader;
     private boolean isGitStubCreated;
 
-    public GitStub(Path path) {
-        this.gitStubConfigBuilder = new GitStubConfigBuilder(path);
-        this.gitStubLogReader = new GitStubLogReader(path);
+    public GitStub(Path testInstanceDir) {
+        Path gitStubDir = testInstanceDir.resolve("git-stub");
+
+        try {
+            Files.createDirectory(gitStubDir);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        this.gitStubConfigBuilder = new GitStubConfigBuilder(gitStubDir);
+        this.gitStubLogReader = new GitStubLogReader(gitStubDir);
     }
 
     public GitStub add(String request, String response, int exitCode) {
@@ -32,6 +42,10 @@ public class GitStub {
     public List<GitStubLogEntry> readLogs() {
         checkGitStubNotCreated();
         return gitStubLogReader.readLogs();
+    }
+
+    public Path getConfigPath() {
+        return gitStubConfigBuilder.getConfigPath();
     }
 
     private void checkGitStubNotCreated() {

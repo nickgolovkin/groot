@@ -1,4 +1,4 @@
-package com.golovkin.utils.git.config;
+package com.golovkin.acceptance.utils.git.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.golovkin.gitstub.config.ConfigEntry;
@@ -27,13 +27,17 @@ public class GitStubConfigBuilder {
     }
 
     public void create() {
-        Path configPath = path.resolve(CONFIG_FILE_NAME);
+        Path configPath = getConfigPath();
 
         try {
             writeConfigToFile(configPath);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Path getConfigPath() {
+        return path.resolve(CONFIG_FILE_NAME);
     }
 
     private void writeConfigToFile(Path configPath) throws IOException {
