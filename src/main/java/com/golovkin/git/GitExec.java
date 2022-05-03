@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 public class GitExec {
     private final Path path;
     private Process process;
-    private int exitCode;
     private List<String> lastExecutedCommands;
 
     public GitExec(Path path) {

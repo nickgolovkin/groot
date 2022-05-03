@@ -17,15 +17,18 @@ import java.util.Map;
  */
 public class App 
 {
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static void main( String[] args )
     {
         String input = String.join(" ", args);
 
         Configuration configuration = new ConfigurationReader().readConfiguration();
         Git git = new Git(configuration.getGitBackendPath());
+        // Кажется, что действительно лучше каждую команду сделать отдельным классом
+        // и инициализировать в соответствующем диалоге. Так быстрее будет
         Branching branching = new Branching(git);
 
-        Map<Class<? extends AbstractDialog>, AbstractDialog> dialogs = getDialogs(configuration, branching);
+        Map<Class<? extends AbstractDialog>, AbstractDialog> dialogs = getDialogs(git, configuration);
         DialogSearcher dialogSearcher = new DialogSearcher(dialogs);
 
         AbstractDialog dialog = dialogSearcher.searchDialog(input);
@@ -34,10 +37,10 @@ public class App
     }
 
     @SuppressWarnings("rawtypes")
-    private static Map<Class<? extends AbstractDialog>, AbstractDialog> getDialogs(Configuration configuration, Branching branching) {
+    private static Map<Class<? extends AbstractDialog>, AbstractDialog> getDialogs(Git git, Configuration configuration) {
         Map<Class<? extends AbstractDialog>, AbstractDialog> abstractDialogs = new HashMap<>();
 
-        abstractDialogs.put(NewBranchDialog.class, new NewBranchDialog(branching, configuration.getProjectEntries()));
+        abstractDialogs.put(NewBranchDialog.class, new NewBranchDialog(git, configuration.getProjectEntries()));
 
         return abstractDialogs;
     }

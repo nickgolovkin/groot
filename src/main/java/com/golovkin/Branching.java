@@ -25,13 +25,7 @@ public class Branching {
      */
     public void newBranch(String projectDirectoryPath, String name) {
         git.resetLastExecutedCommands();
-        try {
-            git.branch(projectDirectoryPath, name);
-            git.checkout(projectDirectoryPath, name);
-        } catch (BranchAlreadyExistsException e) {
-            git.checkout(projectDirectoryPath, name);
-            throw e;
-        }
+
     }
 
     public String getLastExecutedCommandsAsString() {

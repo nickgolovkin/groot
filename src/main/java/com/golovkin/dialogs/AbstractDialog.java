@@ -1,14 +1,17 @@
 package com.golovkin.dialogs;
 
 import com.golovkin.config.ProjectEntry;
+import com.golovkin.git.Git;
 
 import java.util.List;
 
 public abstract class AbstractDialog<Input extends com.golovkin.dialogs.Input, InputParser extends com.golovkin.dialogs.InputParser<Input>> {
     private final List<ProjectEntry> projectEntries;
+    private final Git git;
 
-    public AbstractDialog(List<ProjectEntry> projectEntries) {
+    public AbstractDialog(Git git, List<ProjectEntry> projectEntries) {
         this.projectEntries = projectEntries;
+        this.git = git;
     }
 
     public abstract void start(Input input);
@@ -17,5 +20,9 @@ public abstract class AbstractDialog<Input extends com.golovkin.dialogs.Input, I
 
     protected List<ProjectEntry> getProjectEntries() {
         return projectEntries;
+    }
+
+    protected Git getGit() {
+        return git;
     }
 }
