@@ -2,15 +2,17 @@ package com.golovkin.acceptance;
 
 import com.golovkin.acceptance.utils.PathUtils;
 import com.golovkin.acceptance.utils.app.Groot;
-import com.golovkin.acceptance.utils.app.config.GrootConfigBuilder;
 import com.golovkin.acceptance.utils.git.GitStub;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-public abstract class AbstractIntegrationTest {
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+public abstract class AbstractAcceptanceTest {
     @TempDir
     private Path tempDir;
 

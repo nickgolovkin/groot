@@ -22,7 +22,7 @@ public class App
         String input = String.join(" ", args);
 
         Configuration configuration = new ConfigurationReader().readConfiguration();
-        Git git = new Git(configuration.getGitBackendPathAsPath());
+        Git git = new Git(configuration.getGitBackendPath());
         Branching branching = new Branching(git);
 
         Map<Class<? extends AbstractDialog>, AbstractDialog> dialogs = getDialogs(configuration, branching);

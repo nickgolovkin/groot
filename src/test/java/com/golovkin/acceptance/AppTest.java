@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public class AppTest extends AbstractIntegrationTest {
+public class AppTest extends AbstractAcceptanceTest {
     @Test
     public void sample() throws IOException, InterruptedException, URISyntaxException {
         groot().withProjectEntry("omniutils", "somedir", "someurl")

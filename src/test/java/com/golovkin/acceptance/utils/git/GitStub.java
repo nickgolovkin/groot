@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GitStub {
     private final GitStubConfigBuilder gitStubConfigBuilder;
@@ -42,6 +43,12 @@ public class GitStub {
     public List<GitStubLogEntry> readLogs() {
         checkGitStubNotCreated();
         return gitStubLogReader.readLogs();
+    }
+
+    public List<String> readRequestsFromLog() {
+        return readLogs().stream()
+                .map(GitStubLogEntry::getRequest)
+                .collect(Collectors.toList());
     }
 
     public Path getConfigPath() {

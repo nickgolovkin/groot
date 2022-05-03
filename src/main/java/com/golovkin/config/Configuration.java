@@ -19,11 +19,7 @@ public class Configuration {
         this.projectEntries = projectEntries;
     }
 
-    public String getGitBackendPath() {
-        return gitBackendPath;
-    }
-
-    public Path getGitBackendPathAsPath() {
+    public Path getGitBackendPath() {
         return Paths.get(gitBackendPath);
     }
 

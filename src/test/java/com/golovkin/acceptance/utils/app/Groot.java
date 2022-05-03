@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Groot {
     private GrootConfigBuilder grootConfigBuilder;
@@ -60,6 +61,12 @@ public class Groot {
     public List<GrootLogEntry> readLogs() {
         checkGrootNotCreated();
         return grootLogReader.readLogs();
+    }
+
+    public List<String> readMessagesFromLog() {
+        return readLogs().stream()
+                .map(GrootLogEntry::getMessage)
+                .collect(Collectors.toList());
     }
 
     /**
