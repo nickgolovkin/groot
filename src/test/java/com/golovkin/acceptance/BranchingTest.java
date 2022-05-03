@@ -244,4 +244,79 @@ public class BranchingTest extends AbstractAcceptanceTest {
             assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
         }
     }
+
+    @DisplayName("rename branch")
+    @Nested
+    public class RenameBranch {
+        @Test
+        public void successfully_renamed() {
+            gitStub().add("--git-dir \"(.+)\" branch -M (.+)", "", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("rename branch new_sample_branch");
+
+            List<String> expectedOutput = Lists.newArrayList(
+                    "Переименовываю ветку [sample_branch] в [new_sample_branch]",
+                    "[omniutils] Ветка [sample_branch] успешно переименована в [new_sample_branch]",
+                    "[omniloan] Ветка [sample_branch] успешно переименована в [new_sample_branch]",
+                    "Переименовывание ветки [sample_branch] в [new_sample_branch] завершено"
+            );
+            List<String> actualOutput = groot().getOutput();
+            assertEquals(expectedOutput, actualOutput);
+
+            List<String> expectedGitRequests = Lists.newArrayList(
+                    "--git-dir \"omniutils_dir/.git\" branch -M new_sample_branch",
+                    "--git-dir \"omniloan_dir/.git\" branch -M new_sample_branch"
+            );
+            List<String> actualGitRequests = gitStub().readRequestsFromLog();
+            assertEquals(expectedGitRequests, actualGitRequests);
+
+            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Переименование ветки [sample_branch] в [new_sample_branch]. Ветка успешно переименована. Команды - [--git-dir \"omniutils_dir/.git\" branch -M new_sample_branch]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Переименование ветки [sample_branch] в [new_sample_branch]. Ветка успешно переименована. Команды - [--git-dir \"omniloan_dir/.git\" branch -M new_sample_branch]")
+            );
+            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
+            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
+        }
+
+        @Test
+        public void cannot_rename_branch_in_one_project() {
+            gitStub().add("--git-dir \"omniutils_dir/.git\" branch -M (.+)", "some unexpected\nerror", 1)
+                    .add("--git-dir \"omniloan_dir/.git\" branch -M (.+)", "", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("rename branch new_sample_branch");
+
+            List<String> expectedOutput = Lists.newArrayList(
+                    "Переименовываю ветку [sample_branch] в [new_sample_branch]",
+                    "[omniutils] Не удалось переименовать ветку [sample_branch] в [new_sample_branch]",
+                    "[omniloan] Ветка [sample_branch] успешно переименована в [new_sample_branch]",
+                    "Переименовывание ветки [sample_branch] в [new_sample_branch] завершено"
+            );
+            List<String> actualOutput = groot().getOutput();
+            assertEquals(expectedOutput, actualOutput);
+
+            List<String> expectedGitRequests = Lists.newArrayList(
+                    "--git-dir \"omniutils_dir/.git\" branch -M new_sample_branch",
+                    "--git-dir \"omniloan_dir/.git\" branch -M new_sample_branch"
+            );
+            List<String> actualGitRequests = gitStub().readRequestsFromLog();
+            assertEquals(expectedGitRequests, actualGitRequests);
+
+            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Переименование ветки [sample_branch] в [new_sample_branch]. Не удалось переименовать ветку. Причина ошибки - [some unexpected error]. Команды - [--git-dir \"omniutils_dir/.git\" branch -M new_sample_branch]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Переименование ветки [sample_branch] в [new_sample_branch]. Ветка успешно переименована. Команды - [--git-dir \"omniloan_dir/.git\" branch -M new_sample_branch]")
+            );
+            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
+            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
+        }
+    }
 }
