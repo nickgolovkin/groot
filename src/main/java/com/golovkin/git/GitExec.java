@@ -1,6 +1,7 @@
 package com.golovkin.git;
 
 import com.golovkin.common.exceptions.TimeoutException;
+import com.golovkin.git.exceptions.GitException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +30,10 @@ public class GitExec {
             if (!process.waitFor(1, TimeUnit.SECONDS)) {
                 process.destroyForcibly();
                 throw new TimeoutException(String.format("Время ожидания выполнения команды [%s] вышло", command));
+            }
+
+            if (process.exitValue() != 0) {
+                throw new GitException(getOutput());
             }
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();

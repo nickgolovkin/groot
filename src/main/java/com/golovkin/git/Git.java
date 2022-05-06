@@ -1,16 +1,17 @@
 package com.golovkin.git;
 
+import com.golovkin.RegexUtils;
 import com.golovkin.git.exceptions.BranchAlreadyExistsException;
 import com.golovkin.git.exceptions.BranchNotFoundException;
 import com.golovkin.git.exceptions.GitException;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class Git {
-    public static final String BRANCH_ALREADY_EXISTS_PATTERN = "fatal: A branch named '(.+)' already exists\\.";
-    public static final String BRANCH_NOT_FOUND_PATTERN = "error: branch '(.+)' not found\\.";
+    public static final Pattern BRANCH_ALREADY_EXISTS_PATTERN = Pattern.compile("fatal: A branch named '(.+)' already exists\\.");
+    public static final Pattern BRANCH_NOT_FOUND_PATTERN = Pattern.compile("error: branch '(.+)' not found\\.");
     private Path gitBackendPath;
     private GitExec gitExec;
 
@@ -20,63 +21,41 @@ public class Git {
     }
 
     public void createBranch(String projectDirectoryPath, String name) {
-        gitExec.run(String.format("--git-dir %s/.git branch %s", escapePath(projectDirectoryPath), name));
-
-        if (gitExec.getExitCode() != 0) {
-            List<String> output = gitExec.getOutput();
-            String firstOutputLine = output.get(0);
-
-            if (firstOutputLine != null && firstOutputLine.matches(BRANCH_ALREADY_EXISTS_PATTERN)) {
+        try {
+            gitExec.run(String.format("--git-dir %s/.git branch %s", escapePath(projectDirectoryPath), name));
+        } catch (GitException e) {
+            if (RegexUtils.contains(e.getMessage(), BRANCH_ALREADY_EXISTS_PATTERN)) {
                 throw new BranchAlreadyExistsException(name);
             } else {
-                throw new GitException(output);
+                throw e;
             }
         }
     }
 
     public void deleteBranch(String projectDirectoryPath, String name) {
-        gitExec.run(String.format("--git-dir %s/.git branch -D %s", escapePath(projectDirectoryPath), name));
-
-        if (gitExec.getExitCode() != 0) {
-            List<String> output = gitExec.getOutput();
-            String firstOutputLine = output.get(0);
-
-            if (firstOutputLine != null && firstOutputLine.matches(BRANCH_NOT_FOUND_PATTERN)) {
+        try {
+            gitExec.run(String.format("--git-dir %s/.git branch -D %s", escapePath(projectDirectoryPath), name));
+        } catch (GitException e) {
+            if (RegexUtils.contains(e.getMessage(), BRANCH_NOT_FOUND_PATTERN)) {
                 throw new BranchNotFoundException(name);
             } else {
-                throw new GitException(output);
+                throw e;
             }
         }
     }
 
     public void renameBranch(String projectDirectoryPath, String name) {
         gitExec.run(String.format("--git-dir %s/.git branch -M %s", escapePath(projectDirectoryPath), name));
-
-        if (gitExec.getExitCode() != 0) {
-            List<String> output = gitExec.getOutput();
-
-            throw new GitException(output);
-        }
     }
 
     public String status(String projectDirectoryPath) {
         gitExec.run(String.format("--git-dir %s/.git status", escapePath(projectDirectoryPath)));
 
-        List<String> output = gitExec.getOutput();
-        if (gitExec.getExitCode() != 0) {
-            throw new GitException(output);
-        }
-
-        return String.join(" ", output);
+        return String.join(" ", gitExec.getOutput());
     }
 
     public void checkout(String projectDirectoryPath, String name) {
         gitExec.run(String.format("--git-dir %s/.git checkout %s", escapePath(projectDirectoryPath), name));
-
-        if (gitExec.getExitCode() != 0) {
-            List<String> output = gitExec.getOutput();
-            throw new GitException(output);
-        }
     }
 
     public List<String> getLastExecutedCommands() {

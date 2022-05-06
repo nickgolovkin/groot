@@ -19,4 +19,8 @@ public class RegexUtils {
     public static String extractSubstring(String input, String pattern, String groupName) {
         return extractSubstring(input, Pattern.compile(pattern), groupName);
     }
+
+    public static boolean contains(String input, Pattern pattern) {
+        return pattern.matcher(input).find();
+    }
 }
