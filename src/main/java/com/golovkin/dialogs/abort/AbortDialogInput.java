@@ -1,4 +1,4 @@
-package com.golovkin.dialogs.abort;
+package com.golovkin.dialogs.deletebranch;
 
 import com.golovkin.dialogs.DialogInput;
 

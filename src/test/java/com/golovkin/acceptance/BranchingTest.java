@@ -2,15 +2,9 @@ package com.golovkin.acceptance;
 
 import com.golovkin.acceptance.utils.app.log.GrootLogEntry;
 import com.golovkin.acceptance.utils.common.log.LogLevel;
-import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static com.golovkin.acceptance.utils.app.log.GrootLogAssertions.assertLogEntriesEqual;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("Branching")
 public class BranchingTest extends AbstractAcceptanceTest {
@@ -29,30 +23,24 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             groot().run("new branch sample_branch");
 
-            List<String> expectedOutput = Lists.newArrayList(
+            check().assertOutputEqual(
                     "Создаю ветку [sample_branch]",
                     "[omniutils] Ветка [sample_branch] успешно создана",
                     "[omniloan] Ветка [sample_branch] успешно создана",
                     "Создание ветки [sample_branch] завершено"
             );
-            List<String> actualOutput = groot().getOutput();
-            assertEquals(expectedOutput, actualOutput);
 
-            List<String> expectedGitRequests = Lists.newArrayList(
+            check().assertGitRequestsEqual(
                     "--git-dir omniutils_dir/.git branch sample_branch",
                     "--git-dir omniutils_dir/.git checkout sample_branch",
                     "--git-dir omniloan_dir/.git branch sample_branch",
                     "--git-dir omniloan_dir/.git checkout sample_branch"
             );
-            List<String> actualGitRequests = gitStub().readRequestsFromLog();
-            assertEquals(expectedGitRequests, actualGitRequests);
 
-            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+            check().assertLogsEqual(
                     new GrootLogEntry(LogLevel.INFO, "[omniutils] Создание ветки [sample_branch]. Ветка успешно создана. Команды - [--git-dir omniutils_dir/.git branch sample_branch;--git-dir omniutils_dir/.git checkout sample_branch]"),
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Создание ветки [sample_branch]. Ветка успешно создана. Команды - [--git-dir omniloan_dir/.git branch sample_branch;--git-dir omniloan_dir/.git checkout sample_branch]")
             );
-            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
-            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
         }
 
         @Test
@@ -69,30 +57,24 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             groot().run("new branch sample_branch");
 
-            List<String> expectedOutput = Lists.newArrayList(
+            check().assertOutputEqual(
                     "Создаю ветку [sample_branch]",
                     "[omniutils] Ветка [sample_branch] уже существует",
                     "[omniloan] Ветка [sample_branch] успешно создана",
                     "Создание ветки [sample_branch] завершено"
             );
-            List<String> actualOutput = groot().getOutput();
-            assertEquals(expectedOutput, actualOutput);
 
-            List<String> expectedGitRequests = Lists.newArrayList(
+            check().assertGitRequestsEqual(
                     "--git-dir omniutils_dir/.git branch sample_branch",
                     "--git-dir omniutils_dir/.git checkout sample_branch",
                     "--git-dir omniloan_dir/.git branch sample_branch",
                     "--git-dir omniloan_dir/.git checkout sample_branch"
             );
-            List<String> actualGitRequests = gitStub().readRequestsFromLog();
-            assertEquals(expectedGitRequests, actualGitRequests);
 
-            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+            check().assertLogsEqual(
                     new GrootLogEntry(LogLevel.WARN, "[omniutils] Создание ветки [sample_branch]. Ветка уже существует. Команды - [--git-dir omniutils_dir/.git branch sample_branch;--git-dir omniutils_dir/.git checkout sample_branch]"),
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Создание ветки [sample_branch]. Ветка успешно создана. Команды - [--git-dir omniloan_dir/.git branch sample_branch;--git-dir omniloan_dir/.git checkout sample_branch]")
             );
-            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
-            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
         }
 
         @Test
@@ -108,29 +90,23 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             groot().run("new branch sample_branch");
 
-            List<String> expectedOutput = Lists.newArrayList(
+            check().assertOutputEqual(
                     "Создаю ветку [sample_branch]",
                     "[omniutils] Не удалось создать ветку [sample_branch]",
                     "[omniloan] Ветка [sample_branch] успешно создана",
                     "Создание ветки [sample_branch] завершено"
             );
-            List<String> actualOutput = groot().getOutput();
-            assertEquals(expectedOutput, actualOutput);
 
-            List<String> expectedGitRequests = Lists.newArrayList(
+            check().assertGitRequestsEqual(
                     "--git-dir omniutils_dir/.git branch sample_branch",
                     "--git-dir omniloan_dir/.git branch sample_branch",
                     "--git-dir omniloan_dir/.git checkout sample_branch"
             );
-            List<String> actualGitRequests = gitStub().readRequestsFromLog();
-            assertEquals(expectedGitRequests, actualGitRequests);
 
-            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+            check().assertLogsEqual(
                     new GrootLogEntry(LogLevel.ERROR, "[omniutils] Создание ветки [sample_branch]. Не удалось создать ветку. Причина ошибки - [some unexpected error new line]. Команды - [--git-dir omniutils_dir/.git branch sample_branch]"),
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Создание ветки [sample_branch]. Ветка успешно создана. Команды - [--git-dir omniloan_dir/.git branch sample_branch;--git-dir omniloan_dir/.git checkout sample_branch]")
             );
-            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
-            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
         }
     }
 
@@ -148,28 +124,22 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             groot().run("delete branch sample_branch");
 
-            List<String> expectedOutput = Lists.newArrayList(
+            check().assertOutputEqual(
                     "Удаляю ветку [sample_branch]",
                     "[omniutils] Ветка [sample_branch] успешно удалена",
                     "[omniloan] Ветка [sample_branch] успешно удалена",
                     "Удаление ветки [sample_branch] завершено"
             );
-            List<String> actualOutput = groot().getOutput();
-            assertEquals(expectedOutput, actualOutput);
 
-            List<String> expectedGitRequests = Lists.newArrayList(
+            check().assertGitRequestsEqual(
                     "--git-dir omniutils_dir/.git branch -D sample_branch",
                     "--git-dir omniloan_dir/.git branch -D sample_branch"
             );
-            List<String> actualGitRequests = gitStub().readRequestsFromLog();
-            assertEquals(expectedGitRequests, actualGitRequests);
 
-            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+            check().assertLogsEqual(
                     new GrootLogEntry(LogLevel.INFO, "[omniutils] Удаление ветки [sample_branch]. Ветка успешно удалена. Команды - [--git-dir omniutils_dir/.git branch -D sample_branch]"),
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Удаление ветки [sample_branch]. Ветка успешно удалена. Команды - [--git-dir omniloan_dir/.git branch -D sample_branch]")
             );
-            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
-            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
         }
 
         @Test
@@ -184,28 +154,22 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             groot().run("delete branch sample_branch");
 
-            List<String> expectedOutput = Lists.newArrayList(
+            check().assertOutputEqual(
                     "Удаляю ветку [sample_branch]",
                     "[omniutils] Ветка [sample_branch] не существует",
                     "[omniloan] Ветка [sample_branch] успешно удалена",
                     "Удаление ветки [sample_branch] завершено"
             );
-            List<String> actualOutput = groot().getOutput();
-            assertEquals(expectedOutput, actualOutput);
 
-            List<String> expectedGitRequests = Lists.newArrayList(
+            check().assertGitRequestsEqual(
                     "--git-dir omniutils_dir/.git branch -D sample_branch",
                     "--git-dir omniloan_dir/.git branch -D sample_branch"
             );
-            List<String> actualGitRequests = gitStub().readRequestsFromLog();
-            assertEquals(expectedGitRequests, actualGitRequests);
 
-            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+            check().assertLogsEqual(
                     new GrootLogEntry(LogLevel.WARN, "[omniutils] Удаление ветки [sample_branch]. Ветка не существует. Команды - [--git-dir omniutils_dir/.git branch -D sample_branch]"),
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Удаление ветки [sample_branch]. Ветка успешно удалена. Команды - [--git-dir omniloan_dir/.git branch -D sample_branch]")
             );
-            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
-            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
         }
 
         @Test
@@ -220,28 +184,22 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             groot().run("delete branch sample_branch");
 
-            List<String> expectedOutput = Lists.newArrayList(
+            check().assertOutputEqual(
                     "Удаляю ветку [sample_branch]",
                     "[omniutils] Не удалось удалить ветку [sample_branch]",
                     "[omniloan] Ветка [sample_branch] успешно удалена",
                     "Удаление ветки [sample_branch] завершено"
             );
-            List<String> actualOutput = groot().getOutput();
-            assertEquals(expectedOutput, actualOutput);
 
-            List<String> expectedGitRequests = Lists.newArrayList(
+            check().assertGitRequestsEqual(
                     "--git-dir omniutils_dir/.git branch -D sample_branch",
                     "--git-dir omniloan_dir/.git branch -D sample_branch"
             );
-            List<String> actualGitRequests = gitStub().readRequestsFromLog();
-            assertEquals(expectedGitRequests, actualGitRequests);
 
-            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+            check().assertLogsEqual(
                     new GrootLogEntry(LogLevel.ERROR, "[omniutils] Удаление ветки [sample_branch]. Не удалось удалить ветку. Причина ошибки - [error: Cannot delete branch 'sample_branch' checked out at '/home/nikita/Documents/git_test']. Команды - [--git-dir omniutils_dir/.git branch -D sample_branch]"),
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Удаление ветки [sample_branch]. Ветка успешно удалена. Команды - [--git-dir omniloan_dir/.git branch -D sample_branch]")
             );
-            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
-            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
         }
     }
 
@@ -264,30 +222,24 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             groot().run("rename branch new_sample_branch");
 
-            List<String> expectedOutput = Lists.newArrayList(
+            check().assertOutputEqual(
                     "Переименовываю ветку в [new_sample_branch]",
                     "[omniutils] Ветка [branch_0] успешно переименована в [new_sample_branch]",
                     "[omniloan] Ветка [branch_1] успешно переименована в [new_sample_branch]",
                     "Переименовывание ветки в [new_sample_branch] завершено"
             );
-            List<String> actualOutput = groot().getOutput();
-            assertEquals(expectedOutput, actualOutput);
 
-            List<String> expectedGitRequests = Lists.newArrayList(
+            check().assertGitRequestsEqual(
                     "--git-dir omniutils_dir/.git status",
                     "--git-dir omniutils_dir/.git branch -M new_sample_branch",
                     "--git-dir omniloan_dir/.git status",
                     "--git-dir omniloan_dir/.git branch -M new_sample_branch"
             );
-            List<String> actualGitRequests = gitStub().readRequestsFromLog();
-            assertEquals(expectedGitRequests, actualGitRequests);
 
-            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+            check().assertLogsEqual(
                     new GrootLogEntry(LogLevel.INFO, "[omniutils] Переименование ветки [branch_0] в [new_sample_branch]. Ветка успешно переименована. Команды - [--git-dir omniutils_dir/.git branch -M new_sample_branch]"),
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Переименование ветки [branch_1] в [new_sample_branch]. Ветка успешно переименована. Команды - [--git-dir omniloan_dir/.git branch -M new_sample_branch]")
             );
-            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
-            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
         }
 
         @Test
@@ -304,30 +256,24 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             groot().run("rename branch new_sample_branch");
 
-            List<String> expectedOutput = Lists.newArrayList(
+            check().assertOutputEqual(
                     "Переименовываю ветку в [new_sample_branch]",
                     "[omniutils] Не удалось переименовать ветку [branch_0] в [new_sample_branch]",
                     "[omniloan] Ветка [branch_1] успешно переименована в [new_sample_branch]",
                     "Переименовывание ветки в [new_sample_branch] завершено"
             );
-            List<String> actualOutput = groot().getOutput();
-            assertEquals(expectedOutput, actualOutput);
 
-            List<String> expectedGitRequests = Lists.newArrayList(
+            check().assertGitRequestsEqual(
                     "--git-dir omniutils_dir/.git status",
                     "--git-dir omniutils_dir/.git branch -M new_sample_branch",
                     "--git-dir omniloan_dir/.git status",
                     "--git-dir omniloan_dir/.git branch -M new_sample_branch"
             );
-            List<String> actualGitRequests = gitStub().readRequestsFromLog();
-            assertEquals(expectedGitRequests, actualGitRequests);
 
-            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+            check().assertLogsEqual(
                     new GrootLogEntry(LogLevel.ERROR, "[omniutils] Переименование ветки [branch_0] в [new_sample_branch]. Не удалось переименовать ветку. Причина ошибки - [some unexpected error]. Команды - [--git-dir omniutils_dir/.git branch -M new_sample_branch]"),
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Переименование ветки [branch_1] в [new_sample_branch]. Ветка успешно переименована. Команды - [--git-dir omniloan_dir/.git branch -M new_sample_branch]")
             );
-            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
-            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
         }
     }
 
@@ -350,31 +296,25 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             groot().run("abort");
 
-            List<String> expectedOutput = Lists.newArrayList(
+            check().assertOutputEqual(
                     "Произвожу отмену мержа/черри-пика",
                     "[omniutils] Мерж/черри-пик успешно отменен в [sample_branch]",
                     "[omniloan] Мерж/черри-пик успешно отменен в [sample_branch]",
                     "Отмена мержа/черри-пика завершена"
             );
-            List<String> actualOutput = groot().getOutput();
-            assertEquals(expectedOutput, actualOutput);
 
-            List<String> expectedGitRequests = Lists.newArrayList(
+            check().assertGitRequestsEqual(
                     "--git-dir omniutils_dir/.git status",
                     "--git-dir omniutils_dir/.git merge --abort",
                     "--git-dir omniloan_dir/.git status",
                     "--git-dir omniloan_dir/.git merge --abort",
                     "--git-dir omniloan_dir/.git cherry-pick --abort"
             );
-            List<String> actualGitRequests = gitStub().readRequestsFromLog();
-            assertEquals(expectedGitRequests, actualGitRequests);
 
-            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+            check().assertLogsEqual(
                     new GrootLogEntry(LogLevel.INFO, "[omniutils] Отмена мержа/черри-пика в ветке [sample_branch]. Мерж/черри-пик успешно отменен. Команды - [--git-dir omniutils_dir/.git merge --abort]"),
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Отмена мержа/черри-пика в ветке [sample_branch]. Мерж/черри-пик успешно отменен. Команды - [--git-dir omniloan_dir/.git merge --abort;--git-dir omniloan_dir/.git cherry-pick --abort]")
             );
-            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
-            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
         }
 
         @Test
@@ -393,31 +333,25 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             groot().run("abort");
 
-            List<String> expectedOutput = Lists.newArrayList(
+            check().assertOutputEqual(
                     "Произвожу отмену мержа/черри-пика",
                     "[omniutils] Нет мержа/черри-пика для отмены в [sample_branch]",
                     "[omniloan] Мерж/черри-пик успешно отменен в [sample_branch]",
                     "Отмена мержа/черри-пика завершена"
             );
-            List<String> actualOutput = groot().getOutput();
-            assertEquals(expectedOutput, actualOutput);
 
-            List<String> expectedGitRequests = Lists.newArrayList(
+            check().assertGitRequestsEqual(
                     "--git-dir omniutils_dir/.git status",
                     "--git-dir omniutils_dir/.git merge --abort",
                     "--git-dir omniutils_dir/.git cherry-pick --abort",
                     "--git-dir omniloan_dir/.git status",
                     "--git-dir omniloan_dir/.git merge --abort"
             );
-            List<String> actualGitRequests = gitStub().readRequestsFromLog();
-            assertEquals(expectedGitRequests, actualGitRequests);
 
-            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+            check().assertLogsEqual(
                     new GrootLogEntry(LogLevel.WARN, "[omniutils] Отмена мержа/черри-пика в ветке [sample_branch]. Нет мержа/черри-пика для отмены. Команды - [--git-dir omniutils_dir/.git merge --abort;--git-dir omniutils_dir/.git cherry-pick --abort]"),
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Отмена мержа/черри-пика в ветке [sample_branch]. Мерж/черри-пик успешно отменен. Команды - [--git-dir omniloan_dir/.git merge --abort]")
             );
-            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
-            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
         }
 
         @Test
@@ -436,31 +370,25 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             groot().run("abort");
 
-            List<String> expectedOutput = Lists.newArrayList(
+            check().assertOutputEqual(
                     "Произвожу отмену мержа/черри-пика",
                     "[omniutils] Нет мержа/черри-пика для отмены в [sample_branch]",
                     "[omniloan] Мерж/черри-пик успешно отменен в [sample_branch]",
                     "Отмена мержа/черри-пика завершена"
             );
-            List<String> actualOutput = groot().getOutput();
-            assertEquals(expectedOutput, actualOutput);
 
-            List<String> expectedGitRequests = Lists.newArrayList(
+            check().assertGitRequestsEqual(
                     "--git-dir omniutils_dir/.git status",
                     "--git-dir omniutils_dir/.git merge --abort",
                     "--git-dir omniutils_dir/.git cherry-pick --abort",
                     "--git-dir omniloan_dir/.git status",
                     "--git-dir omniloan_dir/.git merge --abort"
             );
-            List<String> actualGitRequests = gitStub().readRequestsFromLog();
-            assertEquals(expectedGitRequests, actualGitRequests);
 
-            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+            check().assertLogsEqual(
                     new GrootLogEntry(LogLevel.WARN, "[omniutils] Отмена мержа/черри-пика в ветке [sample_branch]. Нет мержа/черри-пика для отмены. Команды - [--git-dir omniutils_dir/.git merge --abort;--git-dir omniutils_dir/.git cherry-pick --abort]"),
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Отмена мержа/черри-пика в ветке [sample_branch]. Мерж/черри-пик успешно отменен. Команды - [--git-dir omniloan_dir/.git merge --abort]")
             );
-            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
-            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
         }
 
         @Test
@@ -479,30 +407,24 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             groot().run("abort");
 
-            List<String> expectedOutput = Lists.newArrayList(
+            check().assertOutputEqual(
                     "Произвожу отмену мержа/черри-пика",
                     "[omniutils] Не удалось отменить мерж/черри-пик в [sample_branch]",
                     "[omniloan] Мерж/черри-пик успешно отменен в [sample_branch]",
                     "Отмена мержа/черри-пика завершена"
             );
-            List<String> actualOutput = groot().getOutput();
-            assertEquals(expectedOutput, actualOutput);
 
-            List<String> expectedGitRequests = Lists.newArrayList(
+            check().assertGitRequestsEqual(
                     "--git-dir omniutils_dir/.git status",
                     "--git-dir omniutils_dir/.git merge --abort",
                     "--git-dir omniloan_dir/.git status",
                     "--git-dir omniloan_dir/.git merge --abort"
             );
-            List<String> actualGitRequests = gitStub().readRequestsFromLog();
-            assertEquals(expectedGitRequests, actualGitRequests);
 
-            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+            check().assertLogsEqual(
                     new GrootLogEntry(LogLevel.ERROR, "[omniutils] Отмена мержа/черри-пика в ветке [sample_branch]. Не удалось отменить мерж/черри-пик. Команды - [--git-dir omniutils_dir/.git merge --abort]"),
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Отмена мержа/черри-пика в ветке [sample_branch]. Мерж/черри-пик успешно отменен. Команды - [--git-dir omniloan_dir/.git merge --abort]")
             );
-            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
-            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
         }
 
         @Test
@@ -521,31 +443,25 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             groot().run("abort");
 
-            List<String> expectedOutput = Lists.newArrayList(
+            check().assertOutputEqual(
                     "Произвожу отмену мержа/черри-пика",
                     "[omniutils] Не удалось отменить мерж/черри-пик в [sample_branch]",
                     "[omniloan] Мерж/черри-пик успешно отменен в [sample_branch]",
                     "Отмена мержа/черри-пика завершена"
             );
-            List<String> actualOutput = groot().getOutput();
-            assertEquals(expectedOutput, actualOutput);
 
-            List<String> expectedGitRequests = Lists.newArrayList(
+            check().assertGitRequestsEqual(
                     "--git-dir omniutils_dir/.git status",
                     "--git-dir omniutils_dir/.git merge --abort",
                     "--git-dir omniutils_dir/.git cherry-pick --abort",
                     "--git-dir omniloan_dir/.git status",
                     "--git-dir omniloan_dir/.git merge --abort"
             );
-            List<String> actualGitRequests = gitStub().readRequestsFromLog();
-            assertEquals(expectedGitRequests, actualGitRequests);
 
-            List<GrootLogEntry> expectedGrootLogs = Lists.newArrayList(
+            check().assertLogsEqual(
                     new GrootLogEntry(LogLevel.ERROR, "[omniutils] Отмена мержа/черри-пика в ветке [sample_branch]. Не удалось отменить мерж/черри-пик. Команды - [--git-dir omniutils_dir/.git merge --abort;--git-dir omniutils_dir/.git cherry-pick --abort]"),
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Отмена мержа/черри-пика в ветке [sample_branch]. Мерж/черри-пик успешно отменен. Команды - [--git-dir omniloan_dir/.git merge --abort]")
             );
-            List<GrootLogEntry> actualGrootLogs = groot().readLogs();
-            assertLogEntriesEqual(expectedGrootLogs, actualGrootLogs);
         }
     }
 }

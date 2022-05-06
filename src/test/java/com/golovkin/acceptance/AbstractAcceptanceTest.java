@@ -2,6 +2,7 @@ package com.golovkin.acceptance;
 
 import com.golovkin.acceptance.utils.PathUtils;
 import com.golovkin.acceptance.utils.app.Groot;
+import com.golovkin.acceptance.utils.common.GrootChecker;
 import com.golovkin.acceptance.utils.git.GitStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -18,6 +19,7 @@ public abstract class AbstractAcceptanceTest {
 
     private GitStub gitStub;
     private Groot groot;
+    private GrootChecker grootChecker;
 
     @BeforeEach
     public void init() throws IOException {
@@ -31,6 +33,7 @@ public abstract class AbstractAcceptanceTest {
         this.gitStub = new GitStub(tempDir);
         this.groot = new Groot(tempDir);
         this.groot.withGitBackendPath(String.format("java -jar -Dapp.path=%s %s", gitStub.getGitStubDirectoryPath().toString(), PathUtils.getResourcePath("/git-stub/git-stub.jar").toString()));
+        this.grootChecker = new GrootChecker(groot, gitStub);
     }
 
     protected Path tempDir() {
@@ -43,5 +46,9 @@ public abstract class AbstractAcceptanceTest {
 
     protected Groot groot() {
         return groot;
+    }
+
+    protected GrootChecker check() {
+        return grootChecker;
     }
 }
