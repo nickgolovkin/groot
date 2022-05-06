@@ -277,6 +277,318 @@ public class BranchingTest extends AbstractAcceptanceTest {
         }
     }
 
+    @DisplayName("checkout")
+    @Nested
+    public class Checkout {
+        @Test
+        public void successful_checkout_first_project_has_checkpoint_second_does_not_have_checkpoint() {
+            gitStub().add("--git-dir (.+) rev-parse --verify sample_branch", "e65f46ad23748e015780f395683ca2d9551ab221", 0)
+                    .add("--git-dir (.+) -a -m \"[GROOT] ~Checkpoint~\"", "[current_branch bac20dd] Hello  1 file changed, 1 insertion(+)  create mode 100644 ok", 0)
+                    .add("--git-dir (.+) checkout sample_branch", "", 0)
+                    .add("--git-dir omniutils_dir/.git log -1 --pretty=\"%H %B\"", "e65f46ad23748e015780f395683ca2d9551ab221 [GROOT] ~Checkpoint~", 0)
+                    .add("--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\"", "e65f46ad23748e015780f395683ca2d9551ab221 Hello", 0)
+                    .add("--git-dir (.+) reset --soft HEAD~1", "", 0);
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("checkout sample_branch");
+
+            check().assertOutputEqual(
+                    "Перехожу из ветки [current_branch] в ветку [sample_branch]",
+                    "[omniutils] Переход в ветку [sample_branch] успешно завершен",
+                    "[omniloan] Переход в ветку [sample_branch] успешно завершен",
+                    "Переход из ветки [current_branch] в ветку [sample_branch] завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "--git-dir omniutils_dir/.git rev-parse --verify sample_branch",
+                    "--git-dir omniutils_dir/.git -a -m \"[GROOT] ~Checkpoint~\"",
+                    "--git-dir omniutils_dir/.git checkout sample_branch",
+                    "--git-dir omniutils_dir/.git log -1 --pretty=\"%H %B\"",
+                    "--git-dir omniutils_dir/.git reset --soft HEAD~1",
+                    "--git-dir omniloan_dir/.git rev-parse --verify sample_branch",
+                    "--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\"",
+                    "--git-dir omniloan_dir/.git checkout sample_branch",
+                    "--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\""
+            );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Переход из ветки [current_branch] в ветку [sample_branch]. Переход в ветку [sample_branch] успешно завершен. Команды - [--git-dir omniutils_dir/.git rev-parse --verify sample_branch;--git-dir omniutils_dir/.git -a -m \"[GROOT] ~Checkpoint~\";--git-dir omniutils_dir/.git checkout sample_branch;--git-dir omniutils_dir/.git log -1 --pretty=\"%H %B\";--git-dir omniutils_dir/.git reset --soft HEAD~1]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Переход из ветки [current_branch] в ветку [sample_branch]. Переход в ветку [sample_branch] успешно завершен. Команды - [--git-dir omniloan_dir/.git rev-parse --verify sample_branch;--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\";--git-dir omniloan_dir/.git checkout sample_branch;--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\"]")
+            );
+        }
+
+        @Test
+        public void one_project_does_not_have_needed_branch() {
+            gitStub().add("--git-dir omniutils_dir/.git rev-parse --verify sample_branch", "fatal: Needed a single revision", 1)
+                    .add("--git-dir omniloan_dir/.git rev-parse --verify sample_branch", "e65f46ad23748e015780f395683ca2d9551ab221", 0)
+                    .add("--git-dir (.+) -a -m \"[GROOT] ~Checkpoint~\"", "[current_branch bac20dd] Hello  1 file changed, 1 insertion(+)  create mode 100644 ok", 0)
+                    .add("--git-dir (.+) checkout sample_branch", "", 0)
+                    .add("--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\"", "e65f46ad23748e015780f395683ca2d9551ab221 Hello", 0)
+                    .add("--git-dir (.+) reset --soft HEAD~1", "", 0);
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("checkout sample_branch");
+
+            check().assertOutputEqual(
+                    "Перехожу из ветки [current_branch] в ветку [sample_branch]",
+                    "[omniutils] Ветка [sample_branch] не найдена",
+                    "[omniloan] Переход в ветку [sample_branch] успешно завершен",
+                    "Переход из ветки [current_branch] в ветку [sample_branch] завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "--git-dir omniutils_dir/.git rev-parse --verify sample_branch",
+                    "--git-dir omniloan_dir/.git rev-parse --verify sample_branch",
+                    "--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\"",
+                    "--git-dir omniloan_dir/.git checkout sample_branch",
+                    "--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\""
+            );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Переход из ветки [current_branch] в ветку [sample_branch]. Ветка [sample_branch] не найдена. Команды - [--git-dir omniutils_dir/.git rev-parse --verify sample_branch]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Переход из ветки [current_branch] в ветку [sample_branch]. Переход в ветку [sample_branch] успешно завершен. Команды - [--git-dir omniloan_dir/.git rev-parse --verify sample_branch;--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\";--git-dir omniloan_dir/.git checkout sample_branch;--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\"]")
+            );
+        }
+
+        @Test
+        public void cannot_check_branch_existence_in_one_project() {
+            gitStub().add("--git-dir omniutils_dir/.git rev-parse --verify sample_branch", "some unexpected\nerror", 1)
+                    .add("--git-dir omniloan_dir/.git rev-parse --verify sample_branch", "e65f46ad23748e015780f395683ca2d9551ab221", 0)
+                    .add("--git-dir (.+) -a -m \"[GROOT] ~Checkpoint~\"", "[current_branch bac20dd] Hello  1 file changed, 1 insertion(+)  create mode 100644 ok", 0)
+                    .add("--git-dir (.+) checkout sample_branch", "", 0)
+                    .add("--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\"", "e65f46ad23748e015780f395683ca2d9551ab221 Hello", 0)
+                    .add("--git-dir (.+) reset --soft HEAD~1", "", 0);
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("checkout sample_branch");
+
+            check().assertOutputEqual(
+                    "Перехожу из ветки [current_branch] в ветку [sample_branch]",
+                    "[omniutils] Не удалось перейти в ветку [sample_branch]",
+                    "[omniloan] Переход в ветку [sample_branch] успешно завершен",
+                    "Переход из ветки [current_branch] в ветку [sample_branch] завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "--git-dir omniutils_dir/.git rev-parse --verify sample_branch",
+                    "--git-dir omniloan_dir/.git rev-parse --verify sample_branch",
+                    "--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\"",
+                    "--git-dir omniloan_dir/.git checkout sample_branch",
+                    "--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\""
+            );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Переход из ветки [current_branch] в ветку [sample_branch]. Не удалось перейти в ветку [sample_branch]. Причина - [some unexpected\nerror]. Команды - [--git-dir omniutils_dir/.git rev-parse --verify sample_branch]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Переход из ветки [current_branch] в ветку [sample_branch]. Переход в ветку [sample_branch] успешно завершен. Команды - [--git-dir omniloan_dir/.git rev-parse --verify sample_branch;--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\";--git-dir omniloan_dir/.git checkout sample_branch;--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\"]")
+            );
+        }
+
+        @Test
+        public void one_project_does_not_have_work_to_save() {
+            gitStub().add("--git-dir (.+) rev-parse --verify sample_branch", "e65f46ad23748e015780f395683ca2d9551ab221", 0)
+                    .add("--git-dir omniutils_dir/.git -a -m \"[GROOT] ~Checkpoint~\"", "On branch current_branch\nnothing to commit, working tree clean", 1)
+                    .add("--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\"", "[current_branch bac20dd] Hello  1 file changed, 1 insertion(+)  create mode 100644 ok", 0)
+                    .add("--git-dir (.+) checkout sample_branch", "", 0)
+                    .add("--git-dir omniutils_dir/.git log -1 --pretty=\"%H %B\"", "e65f46ad23748e015780f395683ca2d9551ab221 [GROOT] ~Checkpoint~", 0)
+                    .add("--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\"", "e65f46ad23748e015780f395683ca2d9551ab221 Hello", 0)
+                    .add("--git-dir (.+) reset --soft HEAD~1", "", 0);
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("checkout sample_branch");
+
+            check().assertOutputEqual(
+                    "Перехожу из ветки [current_branch] в ветку [sample_branch]",
+                    "[omniutils] Переход в ветку [sample_branch] успешно завершен",
+                    "[omniloan] Переход в ветку [sample_branch] успешно завершен",
+                    "Переход из ветки [current_branch] в ветку [sample_branch] завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "--git-dir omniutils_dir/.git rev-parse --verify sample_branch",
+                    "--git-dir omniutils_dir/.git -a -m \"[GROOT] ~Checkpoint~\"",
+                    "--git-dir omniutils_dir/.git checkout sample_branch",
+                    "--git-dir omniutils_dir/.git log -1 --pretty=\"%H %B\"",
+                    "--git-dir omniutils_dir/.git reset --soft HEAD~1",
+                    "--git-dir omniloan_dir/.git rev-parse --verify sample_branch",
+                    "--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\"",
+                    "--git-dir omniloan_dir/.git checkout sample_branch",
+                    "--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\""
+            );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Переход из ветки [current_branch] в ветку [sample_branch]. Переход в ветку [sample_branch] успешно завершен (несохраненных изменений не было). Команды - [--git-dir omniutils_dir/.git rev-parse --verify sample_branch;--git-dir omniutils_dir/.git -a -m \"[GROOT] ~Checkpoint~\";--git-dir omniutils_dir/.git checkout sample_branch;--git-dir omniutils_dir/.git log -1 --pretty=\"%H %B\";--git-dir omniutils_dir/.git reset --soft HEAD~1]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Переход из ветки [current_branch] в ветку [sample_branch]. Переход в ветку [sample_branch] успешно завершен. Команды - [--git-dir omniloan_dir/.git rev-parse --verify sample_branch;--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\";--git-dir omniloan_dir/.git checkout sample_branch;--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\"]")
+            );
+        }
+
+        @Test
+        public void cannot_save_work_in_one_project() {
+            gitStub().add("--git-dir (.+) rev-parse --verify sample_branch", "e65f46ad23748e015780f395683ca2d9551ab221", 0)
+                    .add("--git-dir omniutils_dir/.git -a -m \"[GROOT] ~Checkpoint~\"", "some unexpected\nerror", 1)
+                    .add("--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\"", "[current_branch bac20dd] Hello  1 file changed, 1 insertion(+)  create mode 100644 ok", 0)
+                    .add("--git-dir (.+) checkout sample_branch", "", 0)
+                    .add("--git-dir omniutils_dir/.git log -1 --pretty=\"%H %B\"", "e65f46ad23748e015780f395683ca2d9551ab221 [GROOT] ~Checkpoint~", 0)
+                    .add("--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\"", "e65f46ad23748e015780f395683ca2d9551ab221 Hello", 0)
+                    .add("--git-dir (.+) reset --soft HEAD~1", "", 0);
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("checkout sample_branch");
+
+            check().assertOutputEqual(
+                    "Перехожу из ветки [current_branch] в ветку [sample_branch]",
+                    "[omniutils] Не удалось перейти в ветку [sample_branch]",
+                    "[omniloan] Переход в ветку [sample_branch] успешно завершен",
+                    "Переход из ветки [current_branch] в ветку [sample_branch] завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "--git-dir omniutils_dir/.git rev-parse --verify sample_branch",
+                    "--git-dir omniutils_dir/.git -a -m \"[GROOT] ~Checkpoint~\"",
+                    "--git-dir omniloan_dir/.git rev-parse --verify sample_branch",
+                    "--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\"",
+                    "--git-dir omniloan_dir/.git checkout sample_branch",
+                    "--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\""
+            );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Переход из ветки [current_branch] в ветку [sample_branch]. Не удалось перейти в ветку [sample_branch]. Причина - [some unexpected\nerror]. Команды - [--git-dir omniutils_dir/.git rev-parse --verify sample_branch;--git-dir omniutils_dir/.git -a -m \"[GROOT] ~Checkpoint~\""),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Переход из ветки [current_branch] в ветку [sample_branch]. Переход в ветку [sample_branch] успешно завершен. Команды - [--git-dir omniloan_dir/.git rev-parse --verify sample_branch;--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\";--git-dir omniloan_dir/.git checkout sample_branch;--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\"]")
+            );
+        }
+
+        @Test
+        public void cannot_checkout_in_one_project() {
+            gitStub().add("--git-dir (.+) rev-parse --verify sample_branch", "e65f46ad23748e015780f395683ca2d9551ab221", 0)
+                    .add("--git-dir (.+) -a -m \"[GROOT] ~Checkpoint~\"", "[current_branch bac20dd] Hello  1 file changed, 1 insertion(+)  create mode 100644 ok", 0)
+                    .add("--git-dir omniutils_dir/.git checkout sample_branch", "some unexpected\nerror", 1)
+                    .add("--git-dir omniloan_dir/.git checkout sample_branch", "", 0)
+                    .add("--git-dir (.+) log -1 --pretty=\"%H %B\"", "e65f46ad23748e015780f395683ca2d9551ab221 [GROOT] ~Checkpoint~", 0)
+                    .add("--git-dir (.+) reset --soft HEAD~1", "", 0);
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("checkout sample_branch");
+
+            check().assertOutputEqual(
+                    "Перехожу из ветки [current_branch] в ветку [sample_branch]",
+                    "[omniutils] Не удалось перейти в ветку [sample_branch]",
+                    "[omniloan] Переход в ветку [sample_branch] успешно завершен",
+                    "Переход из ветки [current_branch] в ветку [sample_branch] завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "--git-dir omniutils_dir/.git rev-parse --verify sample_branch",
+                    "--git-dir omniutils_dir/.git -a -m \"[GROOT] ~Checkpoint~\"",
+                    "--git-dir omniutils_dir/.git checkout sample_branch",
+                    "--git-dir omniloan_dir/.git rev-parse --verify sample_branch",
+                    "--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\"",
+                    "--git-dir omniloan_dir/.git checkout sample_branch",
+                    "--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\""
+            );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Переход из ветки [current_branch] в ветку [sample_branch]. Не удалось перейти в ветку [sample_branch]. Причина - [some unexpected\nerror]. Команды - [--git-dir omniutils_dir/.git rev-parse --verify sample_branch;--git-dir omniutils_dir/.git -a -m \"[GROOT] ~Checkpoint~\"];--git-dir omniutils_dir/.git checkout sample_branch"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Переход из ветки [current_branch] в ветку [sample_branch]. Переход в ветку [sample_branch] успешно завершен. Команды - [--git-dir omniloan_dir/.git rev-parse --verify sample_branch;--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\";--git-dir omniloan_dir/.git checkout sample_branch;--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\"]")
+            );
+        }
+
+        @Test
+        public void cannot_check_last_commit_in_one_project() {
+            gitStub().add("--git-dir (.+) rev-parse --verify sample_branch", "e65f46ad23748e015780f395683ca2d9551ab221", 0)
+                    .add("--git-dir (.+) -a -m \"[GROOT] ~Checkpoint~\"", "[current_branch bac20dd] Hello  1 file changed, 1 insertion(+)  create mode 100644 ok", 0)
+                    .add("--git-dir (.+) checkout sample_branch", "", 0)
+                    .add("--git-dir omniutils_dir/.git log -1 --pretty=\"%H %B\"", "some unexpected\nerror", 1)
+                    .add("--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\"", "e65f46ad23748e015780f395683ca2d9551ab221 Hello", 0)
+                    .add("--git-dir (.+) reset --soft HEAD~1", "", 0);
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("checkout sample_branch");
+
+            check().assertOutputEqual(
+                    "Перехожу из ветки [current_branch] в ветку [sample_branch]",
+                    "[omniutils] Не удалось перейти в ветку [sample_branch]",
+                    "[omniloan] Переход в ветку [sample_branch] успешно завершен",
+                    "Переход из ветки [current_branch] в ветку [sample_branch] завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "--git-dir omniutils_dir/.git rev-parse --verify sample_branch",
+                    "--git-dir omniutils_dir/.git -a -m \"[GROOT] ~Checkpoint~\"",
+                    "--git-dir omniutils_dir/.git checkout sample_branch",
+                    "--git-dir omniutils_dir/.git log -1 --pretty=\"%H %B\"",
+                    "--git-dir omniloan_dir/.git rev-parse --verify sample_branch",
+                    "--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\"",
+                    "--git-dir omniloan_dir/.git checkout sample_branch",
+                    "--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\""
+            );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Переход из ветки [current_branch] в ветку [sample_branch]. Не удалось перейти в ветку [sample_branch]. Причина - [some unexpected\nerror]. Команды - [--git-dir omniutils_dir/.git rev-parse --verify sample_branch;--git-dir omniutils_dir/.git -a -m \"[GROOT] ~Checkpoint~\";--git-dir omniutils_dir/.git checkout sample_branch;--git-dir omniutils_dir/.git log -1 --pretty=\"%H %B\""),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Переход из ветки [current_branch] в ветку [sample_branch]. Переход в ветку [sample_branch] успешно завершен. Команды - [--git-dir omniloan_dir/.git rev-parse --verify sample_branch;--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\";--git-dir omniloan_dir/.git checkout sample_branch;--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\"]")
+            );
+        }
+
+        @Test
+        public void cannot_rollback_saved_work_in_one_project() {
+            gitStub().add("--git-dir (.+) rev-parse --verify sample_branch", "e65f46ad23748e015780f395683ca2d9551ab221", 0)
+                    .add("--git-dir (.+) -a -m \"[GROOT] ~Checkpoint~\"", "[current_branch bac20dd] Hello  1 file changed, 1 insertion(+)  create mode 100644 ok", 0)
+                    .add("--git-dir (.+) checkout sample_branch", "", 0)
+                    .add("--git-dir omniutils_dir/.git log -1 --pretty=\"%H %B\"", "e65f46ad23748e015780f395683ca2d9551ab221 [GROOT] ~Checkpoint~", 0)
+                    .add("--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\"", "e65f46ad23748e015780f395683ca2d9551ab221 Hello", 0)
+                    .add("--git-dir (.+) reset --soft HEAD~1", "some unexpected\nerror", 1);
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("checkout sample_branch");
+
+            check().assertOutputEqual(
+                    "Перехожу из ветки [current_branch] в ветку [sample_branch]",
+                    "[omniutils] Не удалось перейти в ветку [sample_branch]",
+                    "[omniloan] Переход в ветку [sample_branch] успешно завершен",
+                    "Переход из ветки [current_branch] в ветку [sample_branch] завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "--git-dir omniutils_dir/.git rev-parse --verify sample_branch",
+                    "--git-dir omniutils_dir/.git -a -m \"[GROOT] ~Checkpoint~\"",
+                    "--git-dir omniutils_dir/.git checkout sample_branch",
+                    "--git-dir omniutils_dir/.git log -1 --pretty=\"%H %B\"",
+                    "--git-dir omniutils_dir/.git reset --soft HEAD~1",
+                    "--git-dir omniloan_dir/.git rev-parse --verify sample_branch",
+                    "--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\"",
+                    "--git-dir omniloan_dir/.git checkout sample_branch",
+                    "--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\""
+            );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Переход из ветки [current_branch] в ветку [sample_branch]. Не удалось перейти в ветку [sample_branch]. Причина - [some unexpected\nerror]. Команды - [--git-dir omniutils_dir/.git rev-parse --verify sample_branch;--git-dir omniutils_dir/.git -a -m \"[GROOT] ~Checkpoint~\";--git-dir omniutils_dir/.git checkout sample_branch;--git-dir omniutils_dir/.git log -1 --pretty=\"%H %B\";--git-dir omniutils_dir/.git reset --soft HEAD~1]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Переход из ветки [current_branch] в ветку [sample_branch]. Переход в ветку [sample_branch] успешно завершен. Команды - [--git-dir omniloan_dir/.git rev-parse --verify sample_branch;--git-dir omniloan_dir/.git -a -m \"[GROOT] ~Checkpoint~\";--git-dir omniloan_dir/.git checkout sample_branch;--git-dir omniloan_dir/.git log -1 --pretty=\"%H %B\"]")
+            );
+        }
+    }
+
     @DisplayName("abort")
     @Nested
     public class Abort {
