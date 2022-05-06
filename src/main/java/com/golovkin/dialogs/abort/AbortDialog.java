@@ -1,56 +1,60 @@
-package com.golovkin.dialogs.deletebranch;
+package com.golovkin.dialogs.abort;
 
 import com.golovkin.config.ProjectEntry;
 import com.golovkin.dialogs.AbstractDialog;
+import com.golovkin.dialogs.deletebranch.DeleteBranchDialogInput;
+import com.golovkin.dialogs.deletebranch.DeleteBranchDialogInputParser;
 import com.golovkin.git.Git;
+import com.golovkin.git.GitUtils;
+import com.golovkin.git.commands.abort.AbortGitCommand;
+import com.golovkin.git.commands.abort.AbortGitCommandInput;
 import com.golovkin.git.commands.deletebranch.DeleteBranchGitCommand;
 import com.golovkin.git.commands.deletebranch.DeleteBranchGitCommandInput;
-import com.golovkin.git.commands.newbranch.NewBranchGitCommand;
-import com.golovkin.git.commands.newbranch.NewBranchGitCommandInput;
-import com.golovkin.git.exceptions.BranchAlreadyExistsException;
 import com.golovkin.git.exceptions.BranchNotFoundException;
+import com.golovkin.git.exceptions.NoCherryPickToAbortException;
+import com.golovkin.git.exceptions.NoMergeToAbortException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class DeleteBranchDialog extends AbstractDialog<DeleteBranchDialogInput, DeleteBranchDialogInputParser> {
-    private final static Logger LOGGER = LoggerFactory.getLogger(DeleteBranchDialog.class);
+public class AbortDialog extends AbstractDialog<AbortDialogInput, AbortDialogInputParser> {
+    private final static Logger LOGGER = LoggerFactory.getLogger(AbortDialog.class);
 
-    public DeleteBranchDialog(Git git,  List<ProjectEntry> projectEntries) {
+    public AbortDialog(Git git, List<ProjectEntry> projectEntries) {
         super(git, projectEntries);
     }
 
     @Override
-    public void start(DeleteBranchDialogInput input) {
-        DeleteBranchGitCommand deleteBranchGitCommand = new DeleteBranchGitCommand(getGit());
+    public void start(AbortDialogInput input) {
+        AbortGitCommand abortGitCommand = new AbortGitCommand(getGit());
+        GitUtils gitUtils = new GitUtils(getGit());
 
-        String branchName = input.getName();
-
-        System.out.printf("Удаляю ветку [%s]\n", branchName);
+        System.out.println("Произвожу отмену мержа/черри-пика");
 
         for (ProjectEntry projectEntry : getProjectEntries()) {
             String projectName = projectEntry.getName();
+            String currentBranchName = gitUtils.getCurrentBranch(projectEntry.getDirectory());
 
             try {
-                DeleteBranchGitCommandInput commandInput = new DeleteBranchGitCommandInput(branchName, projectEntry.getDirectory());
-                deleteBranchGitCommand.execute(commandInput);
-                System.out.printf("[%s] Ветка [%s] успешно удалена\n", projectName, branchName);
-                LOGGER.info("[{}] Удаление ветки [{}]. Ветка успешно удалена. Команды - [{}]", projectName, branchName, getGit().getLastExecutedCommandsAsString());
-            } catch (BranchNotFoundException e) {
-                System.out.printf("[%s] Ветка [%s] не существует\n", projectName, branchName);
-                LOGGER.warn("[{}] Удаление ветки [{}]. Ветка не существует. Команды - [{}]", projectName, branchName, getGit().getLastExecutedCommandsAsString());
+                AbortGitCommandInput commandInput = new AbortGitCommandInput(projectEntry.getDirectory());
+                abortGitCommand.execute(commandInput);
+                System.out.printf("[%s] Мерж/черри-пик успешно отменен в [%s]\n", projectName, currentBranchName);
+                LOGGER.info("[{}] Отмена мержа/черри-пика в ветке [{}]. Мерж/черри-пик успешно отменен. Команды - [{}]", projectName, currentBranchName, getGit().getLastExecutedCommandsAsString());
+            } catch (NoMergeToAbortException | NoCherryPickToAbortException e) {
+                System.out.printf("[%s] Нет мержа/черри-пика для отмены в [%s]\n", projectName, currentBranchName);
+                LOGGER.warn("[{}] Отмена мержа/черри-пика в ветке [{}]. Нет мержа/черри-пика для отмены. Команды - [{}]", projectName, currentBranchName, getGit().getLastExecutedCommandsAsString());
             } catch (Exception e) {
-                System.out.printf("[%s] Не удалось удалить ветку [%s]\n", projectName, branchName);
-                LOGGER.error("[{}] Удаление ветки [{}]. Не удалось удалить ветку. Причина ошибки - [{}]. Команды - [{}]", projectName, branchName, e.getMessage(), getGit().getLastExecutedCommandsAsString());
+                System.out.printf("[%s] Не удалось отменить мерж/черри-пик в [%s]\n", projectName, currentBranchName);
+                LOGGER.error("[{}] Отмена мержа/черри-пика в ветке [{}]. Не удалось отменить мерж/черри-пик. Причина ошибки - [{}]. Команды - [{}]", projectName, currentBranchName, e.getMessage(), getGit().getLastExecutedCommandsAsString());
             }
         }
 
-        System.out.printf("Удаление ветки [%s] завершено\n", branchName);
+        System.out.println("Отмена мержа/черри-пика завершена");
     }
 
     @Override
-    public DeleteBranchDialogInputParser getInputParser() {
-        return new DeleteBranchDialogInputParser();
+    public AbortDialogInputParser getInputParser() {
+        return new AbortDialogInputParser();
     }
 }

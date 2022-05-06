@@ -1,19 +1,16 @@
-package com.golovkin.dialogs.deletebranch;
+package com.golovkin.dialogs.abort;
 
 import com.golovkin.dialogs.DialogInputParser;
+import com.golovkin.dialogs.deletebranch.DeleteBranchDialogInput;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DeleteBranchDialogInputParser implements DialogInputParser<DeleteBranchDialogInput> {
-    private static final Pattern INPUT_PATTERN = Pattern.compile("delete branch (?<name>.+)");
+public class AbortDialogInputParser implements DialogInputParser<AbortDialogInput> {
+    private static final Pattern INPUT_PATTERN = Pattern.compile("abort");
 
-    public DeleteBranchDialogInput parse(String input) {
-        Matcher matcher = INPUT_PATTERN.matcher(input);
-        matcher.find();
-
-        String newBranchName = matcher.group("name");
-        return new DeleteBranchDialogInput(newBranchName);
+    public AbortDialogInput parse(String input) {
+        return new AbortDialogInput();
     }
 
     @Override

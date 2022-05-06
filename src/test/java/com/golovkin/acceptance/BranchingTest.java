@@ -422,7 +422,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
             );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Отмена мержа/черри-пика в ветке [sample_branch]. Не удалось отменить мерж/черри-пик. Команды - [--git-dir omniutils_dir/.git merge --abort]"),
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Отмена мержа/черри-пика в ветке [sample_branch]. Не удалось отменить мерж/черри-пик. Причина ошибки - [some unexpected error]. Команды - [--git-dir omniutils_dir/.git merge --abort]"),
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Отмена мержа/черри-пика в ветке [sample_branch]. Мерж/черри-пик успешно отменен. Команды - [--git-dir omniloan_dir/.git merge --abort]")
             );
         }
@@ -459,7 +459,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
             );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Отмена мержа/черри-пика в ветке [sample_branch]. Не удалось отменить мерж/черри-пик. Команды - [--git-dir omniutils_dir/.git merge --abort;--git-dir omniutils_dir/.git cherry-pick --abort]"),
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Отмена мержа/черри-пика в ветке [sample_branch]. Не удалось отменить мерж/черри-пик. Причина ошибки - [some unexpected error]. Команды - [--git-dir omniutils_dir/.git merge --abort;--git-dir omniutils_dir/.git cherry-pick --abort]"),
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Отмена мержа/черри-пика в ветке [sample_branch]. Мерж/черри-пик успешно отменен. Команды - [--git-dir omniloan_dir/.git merge --abort]")
             );
         }
