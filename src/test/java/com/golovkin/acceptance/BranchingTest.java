@@ -465,6 +465,75 @@ public class BranchingTest extends AbstractAcceptanceTest {
         }
     }
 
+    @DisplayName("reset to commit")
+    @Nested
+    public class ResetToCommit {
+        @Test
+        public void success() {
+            gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
+                    .add("-C (.+) reset --hard HEAD", "HEAD is now at cc12db8 Hello", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("reset to commit");
+
+            check().assertOutputEqual(
+                    "Откатываюсь на текущий коммит",
+                    "[omniutils] Откат на текущий коммит в ветке [sample_branch] успешно завершен",
+                    "[omniloan] Откат на текущий коммит в ветке [sample_branch] успешно завершен",
+                    "Откат на текущий коммит завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "-C omniutils_dir status",
+                    "-C omniutils_dir reset --hard HEAD",
+                    "-C omniloan_dir status",
+                    "-C omniloan_dir reset --hard HEAD"
+            );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Откат на текущий коммит в ветке [sample_branch]. Откат на текущий коммит успешно завершен. Команды - [-C \"omniutils_dir\" status;-C \"omniutils_dir\" reset --hard HEAD]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Откат на текущий коммит в ветке [sample_branch]. Откат на текущий коммит успешно завершен. Команды - [-C \"omniloan_dir\" status;-C \"omniloan_dir\" reset --hard HEAD]")
+            );
+        }
+
+        @Test
+        public void cannot_reset_in_one_project() {
+            gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
+                    .add("-C omniutils_dir reset --hard HEAD", "some unexpected\nerror", 1)
+                    .add("-C omniloan_dir reset --hard HEAD", "HEAD is now at cc12db8 Hello", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("reset to commit");
+
+            check().assertOutputEqual(
+                    "Откатываюсь на текущий коммит",
+                    "[omniutils] Не удалось откатиться на текущий коммит в ветке [sample_branch]",
+                    "[omniloan] Откат на текущий коммит в ветке [sample_branch] успешно завершен",
+                    "Откат на текущий коммит завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "-C omniutils_dir status",
+                    "-C omniutils_dir reset --hard HEAD",
+                    "-C omniloan_dir status",
+                    "-C omniloan_dir reset --hard HEAD"
+            );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Откат на текущий коммит в ветке [sample_branch]. Не удалось откатиться на текущий коммит. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" status;-C \"omniutils_dir\" reset --hard HEAD]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Откат на текущий коммит в ветке [sample_branch]. Откат на текущий коммит успешно завершен. Команды - [-C \"omniloan_dir\" status;-C \"omniloan_dir\" reset --hard HEAD]")
+            );
+        }
+    }
+
     @DisplayName("checkout")
     @Nested
     public class Checkout {
