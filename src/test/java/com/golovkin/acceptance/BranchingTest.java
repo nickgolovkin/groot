@@ -465,75 +465,6 @@ public class BranchingTest extends AbstractAcceptanceTest {
         }
     }
 
-    @DisplayName("reset to commit")
-    @Nested
-    public class ResetToCommit {
-        @Test
-        public void success() {
-            gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
-                    .add("-C (.+) reset --hard HEAD", "HEAD is now at cc12db8 Hello", 0)
-                    .create();
-
-            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
-                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
-                    .create();
-
-            groot().run("reset to commit");
-
-            check().assertOutputEqual(
-                    "Откатываюсь на текущий коммит",
-                    "[omniutils] Откат на текущий коммит в ветке [sample_branch] успешно завершен",
-                    "[omniloan] Откат на текущий коммит в ветке [sample_branch] успешно завершен",
-                    "Откат на текущий коммит завершен"
-            );
-
-            check().assertGitRequestsEqual(
-                    "-C omniutils_dir status",
-                    "-C omniutils_dir reset --hard HEAD",
-                    "-C omniloan_dir status",
-                    "-C omniloan_dir reset --hard HEAD"
-            );
-
-            check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Откат на текущий коммит в ветке [sample_branch]. Откат на текущий коммит успешно завершен. Команды - [-C \"omniutils_dir\" reset --hard HEAD]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Откат на текущий коммит в ветке [sample_branch]. Откат на текущий коммит успешно завершен. Команды - [-C \"omniloan_dir\" reset --hard HEAD]")
-            );
-        }
-
-        @Test
-        public void cannot_reset_in_one_project() {
-            gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
-                    .add("-C omniutils_dir reset --hard HEAD", "some unexpected\nerror", 1)
-                    .add("-C omniloan_dir reset --hard HEAD", "HEAD is now at cc12db8 Hello", 0)
-                    .create();
-
-            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
-                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
-                    .create();
-
-            groot().run("reset to commit");
-
-            check().assertOutputEqual(
-                    "Откатываюсь на текущий коммит",
-                    "[omniutils] Не удалось откатиться на текущий коммит в ветке [sample_branch]",
-                    "[omniloan] Откат на текущий коммит в ветке [sample_branch] успешно завершен",
-                    "Откат на текущий коммит завершен"
-            );
-
-            check().assertGitRequestsEqual(
-                    "-C omniutils_dir status",
-                    "-C omniutils_dir reset --hard HEAD",
-                    "-C omniloan_dir status",
-                    "-C omniloan_dir reset --hard HEAD"
-            );
-
-            check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Откат на текущий коммит в ветке [sample_branch]. Не удалось откатиться на текущий коммит. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" reset --hard HEAD]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Откат на текущий коммит в ветке [sample_branch]. Откат на текущий коммит успешно завершен. Команды - [-C \"omniloan_dir\" reset --hard HEAD]")
-            );
-        }
-    }
-
     @DisplayName("checkout")
     @Nested
     public class Checkout {
@@ -875,6 +806,276 @@ public class BranchingTest extends AbstractAcceptanceTest {
             check().assertLogsEqual(
                     new GrootLogEntry(LogLevel.ERROR, "[omniutils] Переход из ветки [current_branch] в ветку [sample_branch]. Не удалось перейти в ветку [sample_branch]. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" rev-parse --verify sample_branch;-C \"omniutils_dir\" commit -a -m \"[GROOT] ~Checkpoint~\";-C \"omniutils_dir\" checkout sample_branch;-C \"omniutils_dir\" log -1 \"--pretty=%H %B\";-C \"omniutils_dir\" reset --soft HEAD~1]"),
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Переход из ветки [current_branch] в ветку [sample_branch]. Переход в ветку [sample_branch] успешно завершен. Команды - [-C \"omniloan_dir\" rev-parse --verify sample_branch;-C \"omniloan_dir\" commit -a -m \"[GROOT] ~Checkpoint~\";-C \"omniloan_dir\" checkout sample_branch;-C \"omniloan_dir\" log -1 \"--pretty=%H %B\"]")
+            );
+        }
+    }
+
+    @DisplayName("reset to commit")
+    @Nested
+    public class ResetToCommit {
+        @Test
+        public void success() {
+            gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
+                    .add("-C (.+) reset --hard HEAD", "HEAD is now at cc12db8 Hello", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("reset to commit");
+
+            check().assertOutputEqual(
+                    "Откатываюсь на текущий коммит",
+                    "[omniutils] Откат на текущий коммит в ветке [sample_branch] успешно завершен",
+                    "[omniloan] Откат на текущий коммит в ветке [sample_branch] успешно завершен",
+                    "Откат на текущий коммит завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "-C omniutils_dir status",
+                    "-C omniutils_dir reset --hard HEAD",
+                    "-C omniloan_dir status",
+                    "-C omniloan_dir reset --hard HEAD"
+            );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Откат на текущий коммит в ветке [sample_branch]. Откат на текущий коммит успешно завершен. Команды - [-C \"omniutils_dir\" reset --hard HEAD]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Откат на текущий коммит в ветке [sample_branch]. Откат на текущий коммит успешно завершен. Команды - [-C \"omniloan_dir\" reset --hard HEAD]")
+            );
+        }
+
+        @Test
+        public void cannot_reset_in_one_project() {
+            gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
+                    .add("-C omniutils_dir reset --hard HEAD", "some unexpected\nerror", 1)
+                    .add("-C omniloan_dir reset --hard HEAD", "HEAD is now at cc12db8 Hello", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("reset to commit");
+
+            check().assertOutputEqual(
+                    "Откатываюсь на текущий коммит",
+                    "[omniutils] Не удалось откатиться на текущий коммит в ветке [sample_branch]",
+                    "[omniloan] Откат на текущий коммит в ветке [sample_branch] успешно завершен",
+                    "Откат на текущий коммит завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "-C omniutils_dir status",
+                    "-C omniutils_dir reset --hard HEAD",
+                    "-C omniloan_dir status",
+                    "-C omniloan_dir reset --hard HEAD"
+            );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Откат на текущий коммит в ветке [sample_branch]. Не удалось откатиться на текущий коммит. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" reset --hard HEAD]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Откат на текущий коммит в ветке [sample_branch]. Откат на текущий коммит успешно завершен. Команды - [-C \"omniloan_dir\" reset --hard HEAD]")
+            );
+        }
+    }
+
+    @DisplayName("show changes")
+    @Nested
+    public class ShowChanges {
+        @Test
+        public void success() {
+            gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
+                    .add("-C (.+) --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Created from HEAD", 0)
+                    .add("-C (.+) commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
+                    .add("-C (.+) checkout (.+)", "", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("show changes");
+
+            check().assertOutputEqual(
+                    "Показываю изменения",
+                    "[omniutils] Показываю изменения в ветке [sample_branch]",
+                    "[omniloan] Показываю изменения в ветке [sample_branch]",
+                    "Показ изменений завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "-C omniutils_dir status",
+                    "-C omniutils_dir --no-pager reflog show --no-abbrev sample_branch",
+                    "-C omniutils_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
+                    "-C omniutils_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2",
+                    "-C omniloan_dir status",
+                    "-C omniloan_dir --no-pager reflog show --no-abbrev sample_branch",
+                    "-C omniloan_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
+                    "-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2"
+                    );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniutils_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniutils_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniloan_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
+            );
+        }
+
+        @Test
+        public void cannot_find_branch_start_in_one_project() {
+            gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
+                    .add("-C omniutils_dir --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Moved from HEAD", 0)
+                    .add("-C omniloan_dir --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Created from HEAD", 0)
+                    .add("-C (.+) commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
+                    .add("-C (.+) checkout (.+)", "", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("show changes");
+
+            check().assertOutputEqual(
+                    "Показываю изменения",
+                    "[omniutils] Не удалось показать изменения в ветке [sample_branch]",
+                    "[omniloan] Показываю изменения в ветке [sample_branch]",
+                    "Показ изменений завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "-C omniutils_dir status",
+                    "-C omniutils_dir --no-pager reflog show --no-abbrev sample_branch",
+                    "-C omniloan_dir status",
+                    "-C omniloan_dir --no-pager reflog show --no-abbrev sample_branch",
+                    "-C omniloan_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
+                    "-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2"
+                    );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [не найдено начало ветки]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniutils_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniutils_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniloan_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
+            );
+        }
+
+        @Test
+        public void cannot_create_checkpoint_in_one_project() {
+            gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
+                    .add("-C (.+) --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Created from HEAD", 0)
+                    .add("-C omniutils_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~", "some unexpected\nerror", 1)
+                    .add("-C omniloan_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
+                    .add("-C (.+) checkout (.+)", "", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("show changes");
+
+            check().assertOutputEqual(
+                    "Показываю изменения",
+                    "[omniutils] Не удалось показать изменения в ветке [sample_branch]",
+                    "[omniloan] Показываю изменения в ветке [sample_branch]",
+                    "Показ изменений завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "-C omniutils_dir status",
+                    "-C omniutils_dir --no-pager reflog show --no-abbrev sample_branch",
+                    "-C omniutils_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
+                    "-C omniloan_dir status",
+                    "-C omniloan_dir --no-pager reflog show --no-abbrev sample_branch",
+                    "-C omniloan_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
+                    "-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2"
+                    );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniutils_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniutils_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniloan_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
+            );
+        }
+
+        @Test
+        public void cannot_checkout_in_one_project() {
+            gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
+                    .add("-C (.+) --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Created from HEAD", 0)
+                    .add("-C (.+) commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
+                    .add("-C omniutils_dir checkout (.+)", "some unexpected\nerror", 1)
+                    .add("-C omniutils_dir reset --hard 711fbea", "", 0)
+                    .add("-C omniutils_dir reset --soft HEAD~1", "", 0)
+                    .add("-C omniloan_dir checkout (.+)", "", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("show changes");
+
+            check().assertOutputEqual(
+                    "Показываю изменения",
+                    "[omniutils] Не удалось показать изменения в ветке [sample_branch]",
+                    "[omniloan] Показываю изменения в ветке [sample_branch]",
+                    "Показ изменений завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "-C omniutils_dir status",
+                    "-C omniutils_dir --no-pager reflog show --no-abbrev sample_branch",
+                    "-C omniutils_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
+                    "-C omniutils_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2",
+                    "-C omniutils_dir reset --hard 711fbea",
+                    "-C omniutils_dir reset --soft HEAD~1",
+                    "-C omniloan_dir status",
+                    "-C omniloan_dir --no-pager reflog show --no-abbrev sample_branch",
+                    "-C omniloan_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
+                    "-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2"
+                    );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniutils_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniutils_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniloan_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
+            );
+        }
+
+        @Test
+        public void cannot_reset_to_checkpoint_after_failed_checkout() {
+            gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
+                    .add("-C (.+) --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Created from HEAD", 0)
+                    .add("-C (.+) commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
+                    .add("-C omniutils_dir checkout (.+)", "some unexpected\nerror", 1)
+                    .add("-C omniutils_dir reset --hard 711fbea", "another error", 1)
+                    .add("-C omniloan_dir checkout (.+)", "", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("show changes");
+
+            check().assertOutputEqual(
+                    "Показываю изменения",
+                    "[omniutils] Не удалось показать изменения в ветке [sample_branch]",
+                    "[omniloan] Показываю изменения в ветке [sample_branch]",
+                    "Показ изменений завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "-C omniutils_dir status",
+                    "-C omniutils_dir --no-pager reflog show --no-abbrev sample_branch",
+                    "-C omniutils_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
+                    "-C omniutils_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2",
+                    "-C omniutils_dir reset --hard 711fbea",
+                    "-C omniloan_dir status",
+                    "-C omniloan_dir --no-pager reflog show --no-abbrev sample_branch",
+                    "-C omniloan_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
+                    "-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2"
+                    );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniutils_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniutils_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniloan_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
             );
         }
     }
