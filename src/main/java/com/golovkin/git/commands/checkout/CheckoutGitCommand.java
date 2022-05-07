@@ -2,7 +2,6 @@ package com.golovkin.git.commands.checkout;
 
 import com.golovkin.git.Git;
 import com.golovkin.git.commands.AbstractGitCommand;
-import com.golovkin.git.exceptions.BranchAlreadyExistsException;
 import com.golovkin.git.exceptions.NothingToCommitException;
 
 import java.util.List;
@@ -28,7 +27,7 @@ public class CheckoutGitCommand extends AbstractGitCommand<CheckoutGitCommandInp
         getGit().verifyRefExists(projectDirectoryPath, name);
 
         try {
-            getGit().commit(projectDirectoryPath, CHECKPOINT_COMMIT_MESSAGE);
+            getGit().commit(projectDirectoryPath, CHECKPOINT_COMMIT_MESSAGE, false);
         } catch (NothingToCommitException e) {
             isNothingToCommit = true;
         }

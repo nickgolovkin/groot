@@ -8,6 +8,7 @@ import com.golovkin.dialogs.checkout.CheckoutDialog;
 import com.golovkin.dialogs.deletebranch.DeleteBranchDialog;
 import com.golovkin.dialogs.renamebranch.RenameBranchDialog;
 import com.golovkin.dialogs.resettocommit.ResetToCommitDialog;
+import com.golovkin.dialogs.showchanges.ShowChangesDialog;
 import com.golovkin.dialogs.utils.DialogSearcher;
 import com.golovkin.dialogs.DialogInputParser;
 import com.golovkin.dialogs.newbranch.NewBranchDialog;
@@ -48,6 +49,7 @@ public class App
         abstractDialogs.put(AbortDialog.class, new AbortDialog(git, configuration.getProjectEntries()));
         abstractDialogs.put(CheckoutDialog.class, new CheckoutDialog(git, configuration.getProjectEntries()));
         abstractDialogs.put(ResetToCommitDialog.class, new ResetToCommitDialog(git, configuration.getProjectEntries()));
+        abstractDialogs.put(ShowChangesDialog.class, new ShowChangesDialog(git, configuration.getProjectEntries()));
 
         return abstractDialogs;
     }

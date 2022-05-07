@@ -886,7 +886,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
         public void success() {
             gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
                     .add("-C (.+) --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Created from HEAD", 0)
-                    .add("-C (.+) commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
+                    .add("-C (.+) commit --allow-empty -a -m \\[GROOT\\] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
                     .add("-C (.+) checkout (.+)", "", 0)
                     .create();
 
@@ -915,8 +915,8 @@ public class BranchingTest extends AbstractAcceptanceTest {
                     );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniutils_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniutils_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniloan_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
+                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniutils_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniutils_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
             );
         }
 
@@ -925,7 +925,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
             gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
                     .add("-C omniutils_dir --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Moved from HEAD", 0)
                     .add("-C omniloan_dir --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Created from HEAD", 0)
-                    .add("-C (.+) commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
+                    .add("-C (.+) commit --allow-empty -a -m \\[GROOT\\] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
                     .add("-C (.+) checkout (.+)", "", 0)
                     .create();
 
@@ -952,8 +952,8 @@ public class BranchingTest extends AbstractAcceptanceTest {
                     );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [не найдено начало ветки]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniutils_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniutils_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniloan_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [Не удалось найти начало ветки]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
             );
         }
 
@@ -961,8 +961,8 @@ public class BranchingTest extends AbstractAcceptanceTest {
         public void cannot_create_checkpoint_in_one_project() {
             gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
                     .add("-C (.+) --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Created from HEAD", 0)
-                    .add("-C omniutils_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~", "some unexpected\nerror", 1)
-                    .add("-C omniloan_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
+                    .add("-C omniutils_dir commit --allow-empty -a -m \\[GROOT\\] ~Show changes checkpoint~", "some unexpected\nerror", 1)
+                    .add("-C omniloan_dir commit --allow-empty -a -m \\[GROOT\\] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
                     .add("-C (.+) checkout (.+)", "", 0)
                     .create();
 
@@ -990,8 +990,8 @@ public class BranchingTest extends AbstractAcceptanceTest {
                     );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniutils_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniutils_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniloan_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniutils_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\"]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
             );
         }
 
@@ -999,7 +999,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
         public void cannot_checkout_in_one_project() {
             gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
                     .add("-C (.+) --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Created from HEAD", 0)
-                    .add("-C (.+) commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
+                    .add("-C (.+) commit --allow-empty -a -m \\[GROOT\\] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
                     .add("-C omniutils_dir checkout (.+)", "some unexpected\nerror", 1)
                     .add("-C omniutils_dir reset --hard 711fbea", "", 0)
                     .add("-C omniutils_dir reset --soft HEAD~1", "", 0)
@@ -1033,8 +1033,8 @@ public class BranchingTest extends AbstractAcceptanceTest {
                     );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniutils_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniutils_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniloan_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniutils_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniutils_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2;-C \"omniutils_dir\" reset --hard 711fbea;-C \"omniutils_dir\" reset --soft HEAD~1]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
             );
         }
 
@@ -1042,7 +1042,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
         public void cannot_reset_to_checkpoint_after_failed_checkout() {
             gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
                     .add("-C (.+) --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Created from HEAD", 0)
-                    .add("-C (.+) commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
+                    .add("-C (.+) commit --allow-empty -a -m \\[GROOT\\] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
                     .add("-C omniutils_dir checkout (.+)", "some unexpected\nerror", 1)
                     .add("-C omniutils_dir reset --hard 711fbea", "another error", 1)
                     .add("-C omniloan_dir checkout (.+)", "", 0)
@@ -1074,8 +1074,8 @@ public class BranchingTest extends AbstractAcceptanceTest {
                     );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniutils_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniutils_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C omniloan_dir commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniutils_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniutils_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2;-C \"omniutils_dir\" reset --hard 711fbea]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
             );
         }
     }

@@ -18,6 +18,7 @@ public class Git {
     public static final Pattern NO_CHERRY_PICK_TO_ABORT_PATTERN = Pattern.compile("error: no cherry-pick or revert in progress");
     public static final Pattern REF_NOT_EXISTS_PATTERN = Pattern.compile("fatal: Needed a single revision");
     public static final Pattern NOTHING_TO_COMMIT_PATTERN = Pattern.compile("nothing (added ){0,1}to commit");
+    public static final Pattern COMMIT_HASH_PATTERN = Pattern.compile("\\[.+? (?<hash>[A-z|0-9]+)\\]");
     private Path gitBackendPath;
     private GitExec gitExec;
 
@@ -100,9 +101,17 @@ public class Git {
         }
     }
 
-    public void commit(String projectDirectoryPath, String message) {
+    public String commit(String projectDirectoryPath, String message, boolean allowEmpty) {
         try {
-            gitExec.run(String.format("-C \"%s\" commit -a -m \"%s\"", projectDirectoryPath, message));
+            if (allowEmpty) {
+                gitExec.run(String.format("-C \"%s\" commit --allow-empty -a -m \"%s\"", projectDirectoryPath, message));
+            } else {
+                gitExec.run(String.format("-C \"%s\" commit -a -m \"%s\"", projectDirectoryPath, message));
+            }
+
+            String output = String.join(" ", gitExec.getOutput());
+
+            return RegexUtils.extractSubstring(output, COMMIT_HASH_PATTERN, "hash");
         } catch (GitException e) {
             if (RegexUtils.contains(e.getMessage(), NOTHING_TO_COMMIT_PATTERN)) {
                 throw new NothingToCommitException();
@@ -121,8 +130,13 @@ public class Git {
         gitExec.run(String.format("-C \"%s\" reset --soft %s", projectDirectoryPath, refName));
     }
 
-    public void hardReset(String projectDirectoryPath) {
-        gitExec.run(String.format("-C \"%s\" reset --hard HEAD", projectDirectoryPath));
+    public void hardReset(String projectDirectoryPath, String refName) {
+        gitExec.run(String.format("-C \"%s\" reset --hard %s", projectDirectoryPath, refName));
+    }
+
+    public String reflog(String projectDirectoryPath, String branchName) {
+        gitExec.run(String.format("-C \"%s\" --no-pager reflog show --no-abbrev %s", projectDirectoryPath, branchName));
+        return String.join("\n", gitExec.getOutput());
     }
 
     public List<String> getLastExecutedCommands() {
