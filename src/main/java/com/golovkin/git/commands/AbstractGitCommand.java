@@ -2,7 +2,7 @@ package com.golovkin.git.commands;
 
 import com.golovkin.git.Git;
 
-public abstract class AbstractGitCommand<T extends GitCommandInput> {
+public abstract class AbstractGitCommand<T extends GitCommandInput, E extends GitCommandOutput> {
     private final Git git;
 
     /**
@@ -10,20 +10,19 @@ public abstract class AbstractGitCommand<T extends GitCommandInput> {
      * Git представляет из себя лишь удобное API для запуска команд Git
      * Взаимодействие с пользователем происходит через диалоги.
      * При подаче на вход команды анализируется, какой диалог запустить, после чего диалог запускается
-     * @param name
      */
     public AbstractGitCommand(Git git) {
         this.git = git;
     }
 
-    public final void execute(T commandInput) {
+    public final E execute(T commandInput) {
         git.resetLastExecutedCommands();
-        performCommand(commandInput);
+        return performCommand(commandInput);
     }
 
     protected Git getGit() {
         return git;
     }
 
-    protected abstract void performCommand(T commandInput);
+    protected abstract E performCommand(T commandInput);
 }

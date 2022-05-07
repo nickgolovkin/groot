@@ -16,6 +16,8 @@ public class Git {
     public static final Pattern BRANCH_NOT_FOUND_PATTERN = Pattern.compile("error: branch '(.+)' not found\\.");
     public static final Pattern NO_MERGE_TO_ABORT_PATTERN = Pattern.compile("fatal: There is no merge to abort \\(MERGE_HEAD missing\\)\\.");
     public static final Pattern NO_CHERRY_PICK_TO_ABORT_PATTERN = Pattern.compile("error: no cherry-pick or revert in progress");
+    public static final Pattern REF_NOT_EXISTS_PATTERN = Pattern.compile("fatal: Needed a single revision");
+    public static final Pattern NOTHING_TO_COMMIT_PATTERN = Pattern.compile("nothing (added ){0,1}to commit");
     private Path gitBackendPath;
     private GitExec gitExec;
 
@@ -84,6 +86,39 @@ public class Git {
 
     public void checkout(String projectDirectoryPath, String name) {
         gitExec.run(String.format("--git-dir %s/.git checkout %s", escapePath(projectDirectoryPath), name));
+    }
+
+    public void verifyRefExists(String projectDirectoryPath, String name) {
+        try {
+            gitExec.run(String.format("--git-dir %s/.git rev-parse --verify %s", projectDirectoryPath, name));
+        } catch (GitException e) {
+            if (RegexUtils.contains(e.getMessage(), REF_NOT_EXISTS_PATTERN)) {
+                throw new RefNotExistsException(name);
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    public void commit(String projectDirectoryPath, String message) {
+        try {
+            gitExec.run(String.format("--git-dir %s/.git commit -a -m \"%s\"", projectDirectoryPath, message));
+        } catch (GitException e) {
+            if (RegexUtils.contains(e.getMessage(), NOTHING_TO_COMMIT_PATTERN)) {
+                throw new NothingToCommitException();
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    public List<String> log(String projectDirectoryPath, int entryCount, String prettyFormat) {
+        gitExec.run(String.format("--git-dir %s/.git log -%d --pretty=\"%s\"", projectDirectoryPath, entryCount, prettyFormat));
+        return gitExec.getOutput();
+    }
+
+    public void softReset(String projectDirectoryPath, String refName) {
+        gitExec.run(String.format("--git-dir %s/.git reset --soft %s", projectDirectoryPath, refName));
     }
 
     public List<String> getLastExecutedCommands() {
