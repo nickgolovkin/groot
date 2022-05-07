@@ -5,6 +5,7 @@ import com.golovkin.git.Git;
 import com.golovkin.git.commands.AbstractGitCommand;
 import com.golovkin.git.commands.EmptyGitCommandOutput;
 import com.golovkin.git.exceptions.BranchAlreadyExistsException;
+import com.golovkin.git.exceptions.ChangesAlreadyShowingException;
 import com.golovkin.git.exceptions.GitException;
 
 import java.util.List;
@@ -25,6 +26,11 @@ public class ShowChangesGitCommand extends AbstractGitCommand<ShowChangesGitComm
         String name = commandInput.getBranchName();
 
         List<String> reflog = getGit().reflog(projectDirectoryPath, name);
+
+        String alreadyExistingCheckpointHash = ShowChangesUtils.getCheckpointHash(reflog);
+        if (alreadyExistingCheckpointHash != null) {
+            throw new ChangesAlreadyShowingException();
+        }
 
         // TODO с регексом будь осторожнее
         String branchStartHash = RegexUtils.extractFirstSubstring(reflog, BRANCH_START_COMMIT_PATTERN, "hash");

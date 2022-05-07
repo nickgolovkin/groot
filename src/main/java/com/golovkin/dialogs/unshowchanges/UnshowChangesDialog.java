@@ -8,6 +8,7 @@ import com.golovkin.git.commands.showchanges.ShowChangesGitCommand;
 import com.golovkin.git.commands.showchanges.ShowChangesGitCommandInput;
 import com.golovkin.git.commands.unshowchanges.UnshowChangesGitCommand;
 import com.golovkin.git.commands.unshowchanges.UnshowChangesGitCommandInput;
+import com.golovkin.git.exceptions.NoActiveShowChangesException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,9 @@ public class UnshowChangesDialog extends AbstractDialog<UnshowChangesDialogInput
                 unshowChangesGitCommand.execute(commandInput);
                 System.out.printf("[%s] Откат показа изменений в ветке [%s] успешно завершен\n", projectName, currentBranchName);
                 LOGGER.info("[{}] Откат показа изменений в ветке [{}]. Команды - [{}]", projectName, currentBranchName, getGit().getLastExecutedCommandsAsString());
+            } catch (NoActiveShowChangesException e) {
+                System.out.printf("[%s] Сейчас не производится показ изменений в ветке [%s]\n", projectName, currentBranchName);
+                LOGGER.warn("[{}] Откат показа изменений в ветке [{}]. Сейчас не производится показ изменений. Команды - [{}]", projectName, currentBranchName, getGit().getLastExecutedCommandsAsString());
             } catch (Exception e) {
                 System.out.printf("[%s] Не удалось отменить показ изменений в ветке [%s]\n", projectName, currentBranchName);
                 LOGGER.error("[{}] Откат показа изменений в ветке [{}]. Не удалось отменить показ изменений. Причина ошибки - [{}]. Команды - [{}]", projectName, currentBranchName, e.getMessage(), getGit().getLastExecutedCommandsAsString());

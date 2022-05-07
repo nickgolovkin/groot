@@ -9,6 +9,7 @@ import com.golovkin.git.commands.newbranch.NewBranchGitCommandInput;
 import com.golovkin.git.commands.showchanges.ShowChangesGitCommand;
 import com.golovkin.git.commands.showchanges.ShowChangesGitCommandInput;
 import com.golovkin.git.exceptions.BranchAlreadyExistsException;
+import com.golovkin.git.exceptions.ChangesAlreadyShowingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,9 @@ public class ShowChangesDialog extends AbstractDialog<ShowChangesDialogInput, Sh
                 showChangesGitCommand.execute(commandInput);
                 System.out.printf("[%s] Показываю изменения в ветке [%s]\n", projectName, currentBranchName);
                 LOGGER.info("[{}] Показ изменений в ветке [{}]. Команды - [{}]", projectName, currentBranchName, getGit().getLastExecutedCommandsAsString());
+            } catch (ChangesAlreadyShowingException e) {
+                System.out.printf("[%s] Вы уже просматриваете изменения в ветке [%s]\n", projectName, currentBranchName);
+                LOGGER.warn("[{}] Показ изменений в ветке [{}]. Уже идет показ изменений. Команды - [{}]", projectName, currentBranchName, getGit().getLastExecutedCommandsAsString());
             } catch (Exception e) {
                 System.out.printf("[%s] Не удалось показать изменения в ветке [%s]\n", projectName, currentBranchName);
                 LOGGER.error("[{}] Показ изменений в ветке [{}]. Не удалось показать изменения. Причина ошибки - [{}]. Команды - [{}]", projectName, currentBranchName, e.getMessage(), getGit().getLastExecutedCommandsAsString());

@@ -4,16 +4,14 @@ import com.golovkin.RegexUtils;
 import com.golovkin.git.Git;
 import com.golovkin.git.commands.AbstractGitCommand;
 import com.golovkin.git.commands.EmptyGitCommandOutput;
+import com.golovkin.git.commands.showchanges.ShowChangesUtils;
 import com.golovkin.git.exceptions.GitException;
+import com.golovkin.git.exceptions.NoActiveShowChangesException;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class UnshowChangesGitCommand extends AbstractGitCommand<UnshowChangesGitCommandInput, EmptyGitCommandOutput> {
-
-    public static final Pattern CHECKPOINT_COMMIT_PATTERN = Pattern.compile("(?<hash>[A-z|0-9]+).+commit: \\[GROOT\\] ~Show changes checkpoint~");
-    public static final int EXPECTED_CHECKPOINT_COMMIT_INDEX_IN_REFLOG = 1;
-
     public UnshowChangesGitCommand(Git git) {
         super(git);
     }
@@ -25,14 +23,10 @@ public class UnshowChangesGitCommand extends AbstractGitCommand<UnshowChangesGit
 
         List<String> reflog = getGit().reflog(projectDirectoryPath, name);
 
-        if (reflog.size() < EXPECTED_CHECKPOINT_COMMIT_INDEX_IN_REFLOG + 1) {
-            throw new GitException("Не удалось найти контрольную точку");
-        }
-
         // TODO попробовать вместо null использовать Optional?
-        String checkpointHash = RegexUtils.extractSubstring(reflog.get(EXPECTED_CHECKPOINT_COMMIT_INDEX_IN_REFLOG), CHECKPOINT_COMMIT_PATTERN, "hash");
+        String checkpointHash = ShowChangesUtils.getCheckpointHash(reflog);
         if (checkpointHash == null) {
-            throw new GitException("Не удалось найти контрольную точку");
+            throw new NoActiveShowChangesException();
         }
 
         getGit().hardReset(projectDirectoryPath, checkpointHash);

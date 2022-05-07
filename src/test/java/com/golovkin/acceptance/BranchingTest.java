@@ -1079,6 +1079,43 @@ public class BranchingTest extends AbstractAcceptanceTest {
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2]")
             );
         }
+
+        @Test
+        public void cannot_show_changes_in_one_project_because_they_are_currently_showing() {
+            gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
+                    .add("-C omniutils_dir --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_1, branch_2) branch_1@{0}: reset: moving to cc12db8403863270da16d306b5e7aea2ea6121b2\n66fc31a80915349b8d7a458a3c2de0dc326ea884 branch_1@{1}: commit: [GROOT] ~Show changes checkpoint~\n5c0c5977997e9c4946b01dcc0dab05527205de35 branch_1@{2}: reset: moving to 5c0c5977997e9c4946b01dcc0dab05527205de35\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_1, branch_2) branch_1@{3}: reset: moving to HEAD~1\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_1, branch_2) branch_1@{42}: branch: Created from master", 0)
+                    .add("-C omniloan_dir --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Created from HEAD", 0)
+                    .add("-C (.+) commit --allow-empty -a -m \\[GROOT\\] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
+                    .add("-C (.+) reset --soft (.+)", "", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("show changes");
+
+            check().assertOutputEqual(
+                    "Показываю изменения",
+                    "[omniutils] Вы уже просматриваете изменения в ветке [sample_branch]",
+                    "[omniloan] Показываю изменения в ветке [sample_branch]",
+                    "Показ изменений завершен"
+            );
+
+            check().assertGitRequestsEqual(
+                    "-C omniutils_dir status",
+                    "-C omniutils_dir --no-pager reflog show --no-abbrev sample_branch",
+                    "-C omniloan_dir status",
+                    "-C omniloan_dir --no-pager reflog show --no-abbrev sample_branch",
+                    "-C omniloan_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
+                    "-C omniloan_dir reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2"
+            );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.WARN, "[omniutils] Показ изменений в ветке [sample_branch]. Уже идет показ изменений. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2]")
+            );
+        }
     }
 
     @DisplayName("unshow changes")
@@ -1139,7 +1176,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Откатываю показ изменений",
-                    "[omniutils] Не удалось отменить показ изменений в ветке [sample_branch]",
+                    "[omniutils] Сейчас не производится показ изменений в ветке [sample_branch]",
                     "[omniloan] Откат показа изменений в ветке [sample_branch] успешно завершен",
                     "Откат показа изменений завершен"
             );
@@ -1154,7 +1191,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
             );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Откат показа изменений в ветке [sample_branch]. Не удалось отменить показ изменений. Причина ошибки - [Не удалось найти контрольную точку]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch]"),
+                    new GrootLogEntry(LogLevel.WARN, "[omniutils] Откат показа изменений в ветке [sample_branch]. Сейчас не производится показ изменений. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch]"),
                     new GrootLogEntry(LogLevel.INFO, "[omniloan] Откат показа изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" reset --hard 5c0c5977997e9c4946b01dcc0dab05527205de35;-C \"omniloan_dir\" reset --soft HEAD~1]")
             );
         }
