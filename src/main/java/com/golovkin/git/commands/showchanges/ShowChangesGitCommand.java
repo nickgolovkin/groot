@@ -7,10 +7,14 @@ import com.golovkin.git.commands.EmptyGitCommandOutput;
 import com.golovkin.git.exceptions.BranchAlreadyExistsException;
 import com.golovkin.git.exceptions.GitException;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ShowChangesGitCommand extends AbstractGitCommand<ShowChangesGitCommandInput, EmptyGitCommandOutput> {
+
+    public static final Pattern BRANCH_START_COMMIT_PATTERN = Pattern.compile("(?<hash>[A-z|0-9]+).+branch: Created from");
+
     public ShowChangesGitCommand(Git git) {
         super(git);
     }
@@ -20,9 +24,10 @@ public class ShowChangesGitCommand extends AbstractGitCommand<ShowChangesGitComm
         String projectDirectoryPath = commandInput.getProjectDirectoryPath();
         String name = commandInput.getBranchName();
 
-        String reflog = String.join(" ", getGit().reflog(projectDirectoryPath, name));
+        List<String> reflog = getGit().reflog(projectDirectoryPath, name);
 
-        String branchStartHash = RegexUtils.extractSubstring(reflog, "(?<hash>[A-z|0-9]+).+branch: Created from", "hash");
+        // TODO с регексом будь осторожнее
+        String branchStartHash = RegexUtils.extractFirstSubstring(reflog, BRANCH_START_COMMIT_PATTERN, "hash");
         if (branchStartHash == null) {
             throw new GitException("Не удалось найти начало ветки");
         }
