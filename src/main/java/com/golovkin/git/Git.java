@@ -121,6 +121,10 @@ public class Git {
         gitExec.run(String.format("-C \"%s\" reset --soft %s", projectDirectoryPath, refName));
     }
 
+    public void hardReset(String projectDirectoryPath) {
+        gitExec.run(String.format("-C \"%s\" reset --hard HEAD", projectDirectoryPath));
+    }
+
     public List<String> getLastExecutedCommands() {
         return gitExec.getLastExecutedCommands();
     }

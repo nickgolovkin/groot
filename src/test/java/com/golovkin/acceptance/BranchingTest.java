@@ -495,8 +495,8 @@ public class BranchingTest extends AbstractAcceptanceTest {
             );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Откат на текущий коммит в ветке [sample_branch]. Откат на текущий коммит успешно завершен. Команды - [-C \"omniutils_dir\" status;-C \"omniutils_dir\" reset --hard HEAD]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Откат на текущий коммит в ветке [sample_branch]. Откат на текущий коммит успешно завершен. Команды - [-C \"omniloan_dir\" status;-C \"omniloan_dir\" reset --hard HEAD]")
+                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Откат на текущий коммит в ветке [sample_branch]. Откат на текущий коммит успешно завершен. Команды - [-C \"omniutils_dir\" reset --hard HEAD]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Откат на текущий коммит в ветке [sample_branch]. Откат на текущий коммит успешно завершен. Команды - [-C \"omniloan_dir\" reset --hard HEAD]")
             );
         }
 
@@ -528,8 +528,8 @@ public class BranchingTest extends AbstractAcceptanceTest {
             );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Откат на текущий коммит в ветке [sample_branch]. Не удалось откатиться на текущий коммит. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" status;-C \"omniutils_dir\" reset --hard HEAD]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Откат на текущий коммит в ветке [sample_branch]. Откат на текущий коммит успешно завершен. Команды - [-C \"omniloan_dir\" status;-C \"omniloan_dir\" reset --hard HEAD]")
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Откат на текущий коммит в ветке [sample_branch]. Не удалось откатиться на текущий коммит. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" reset --hard HEAD]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Откат на текущий коммит в ветке [sample_branch]. Откат на текущий коммит успешно завершен. Команды - [-C \"omniloan_dir\" reset --hard HEAD]")
             );
         }
     }
