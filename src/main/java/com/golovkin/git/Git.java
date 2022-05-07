@@ -134,9 +134,9 @@ public class Git {
         gitExec.run(String.format("-C \"%s\" reset --hard %s", projectDirectoryPath, refName));
     }
 
-    public String reflog(String projectDirectoryPath, String branchName) {
+    public List<String> reflog(String projectDirectoryPath, String branchName) {
         gitExec.run(String.format("-C \"%s\" --no-pager reflog show --no-abbrev %s", projectDirectoryPath, branchName));
-        return String.join("\n", gitExec.getOutput());
+        return gitExec.getOutput();
     }
 
     public List<String> getLastExecutedCommands() {

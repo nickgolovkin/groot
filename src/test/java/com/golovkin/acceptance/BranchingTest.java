@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+// TODO разделить потом на юнит тесты. В приемочных оставить только то, что имеет разницу для пользователя (например, ошибки с пояснениями или обработка исключенительных ситуаций, кроме как логирование ошибки (хотя один кейс с логированием должен быть))
 @DisplayName("Branching")
 public class BranchingTest extends AbstractAcceptanceTest {
     @DisplayName("new branch")
@@ -1116,8 +1117,8 @@ public class BranchingTest extends AbstractAcceptanceTest {
             );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Откат показа изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Откат показа изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
+                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Откат показа изменений в ветке [sample_branch]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniutils_dir\" reset --hard 5c0c5977997e9c4946b01dcc0dab05527205de35;-C \"omniutils_dir\" reset --soft HEAD~1]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Откат показа изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" reset --hard 5c0c5977997e9c4946b01dcc0dab05527205de35;-C \"omniloan_dir\" reset --soft HEAD~1]")
             );
         }
 
@@ -1153,8 +1154,8 @@ public class BranchingTest extends AbstractAcceptanceTest {
             );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Откат показа изменений в ветке [sample_branch]. Не удалось отменить показ изменений. Причина ошибки - [Не удалось найти контрольную точку]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Откат показа изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Откат показа изменений в ветке [sample_branch]. Не удалось отменить показ изменений. Причина ошибки - [Не удалось найти контрольную точку]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Откат показа изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" reset --hard 5c0c5977997e9c4946b01dcc0dab05527205de35;-C \"omniloan_dir\" reset --soft HEAD~1]")
             );
         }
 
@@ -1191,8 +1192,8 @@ public class BranchingTest extends AbstractAcceptanceTest {
             );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Откат показа изменений в ветке [sample_branch]. Не удалось отменить показ изменений. Причина ошибки - [some unexpected error]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Откат показа изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Откат показа изменений в ветке [sample_branch]. Не удалось отменить показ изменений. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniutils_dir\" reset --hard 5c0c5977997e9c4946b01dcc0dab05527205de35]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Откат показа изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" reset --hard 5c0c5977997e9c4946b01dcc0dab05527205de35;-C \"omniloan_dir\" reset --soft HEAD~1]")
             );
         }
     }

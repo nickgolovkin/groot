@@ -20,7 +20,7 @@ public class ShowChangesGitCommand extends AbstractGitCommand<ShowChangesGitComm
         String projectDirectoryPath = commandInput.getProjectDirectoryPath();
         String name = commandInput.getBranchName();
 
-        String reflog = getGit().reflog(projectDirectoryPath, name);
+        String reflog = String.join(" ", getGit().reflog(projectDirectoryPath, name));
 
         String branchStartHash = RegexUtils.extractSubstring(reflog, "(?<hash>[A-z|0-9]+).+branch: Created from", "hash");
         if (branchStartHash == null) {
