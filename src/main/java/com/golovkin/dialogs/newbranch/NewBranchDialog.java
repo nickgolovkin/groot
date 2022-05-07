@@ -11,6 +11,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static com.golovkin.common.ColorUtils.error;
+import static com.golovkin.common.ColorUtils.warn;
+import static com.golovkin.common.PrintUtils.printf;
+
 public class NewBranchDialog extends AbstractDialog<NewBranchDialogInput, NewBranchDialogInputParser> {
     private final static Logger LOGGER = LoggerFactory.getLogger(NewBranchDialog.class);
 
@@ -24,7 +28,7 @@ public class NewBranchDialog extends AbstractDialog<NewBranchDialogInput, NewBra
 
         String newBranchName = input.getName();
 
-        System.out.printf("Создаю ветку [%s]\n", newBranchName);
+        printf("Создаю ветку [%s]", newBranchName);
 
         for (ProjectEntry projectEntry : getProjectEntries()) {
             String projectName = projectEntry.getName();
@@ -32,18 +36,18 @@ public class NewBranchDialog extends AbstractDialog<NewBranchDialogInput, NewBra
             try {
                 NewBranchGitCommandInput commandInput = new NewBranchGitCommandInput(newBranchName, projectEntry.getDirectory());
                 newBranchGitCommand.execute(commandInput);
-                System.out.printf("[%s] Ветка [%s] успешно создана\n", projectName, newBranchName);
+                printf("[%s] Ветка [%s] успешно создана", projectName, newBranchName);
                 LOGGER.info("[{}] Создание ветки [{}]. Ветка успешно создана. Команды - [{}]", projectName, newBranchName, getGit().getLastExecutedCommandsAsString());
             } catch (BranchAlreadyExistsException e) {
-                System.out.printf("[%s] Ветка [%s] уже существует\n", projectName, newBranchName);
+                printf(warn("[%s] Ветка [%s] уже существует"), projectName, newBranchName);
                 LOGGER.warn("[{}] Создание ветки [{}]. Ветка уже существует. Команды - [{}]", projectName, newBranchName, getGit().getLastExecutedCommandsAsString());
             } catch (Exception e) {
-                System.out.printf("[%s] Не удалось создать ветку [%s]\n", projectName, newBranchName);
+                printf(error("[%s] Не удалось создать ветку [%s]"), projectName, newBranchName);
                 LOGGER.error("[{}] Создание ветки [{}]. Не удалось создать ветку. Причина ошибки - [{}]. Команды - [{}]", projectName, newBranchName, e.getMessage(), getGit().getLastExecutedCommandsAsString());
             }
         }
 
-        System.out.printf("Создание ветки [%s] завершено\n", newBranchName);
+        printf("Создание ветки [%s] завершено", newBranchName);
     }
 
     @Override

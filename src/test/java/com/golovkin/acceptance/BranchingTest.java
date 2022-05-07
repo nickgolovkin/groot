@@ -6,6 +6,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static com.golovkin.common.ColorUtils.error;
+import static com.golovkin.common.ColorUtils.warn;
+
 // TODO разделить потом на юнит тесты. В приемочных оставить только то, что имеет разницу для пользователя (например, ошибки с пояснениями или обработка исключенительных ситуаций, кроме как логирование ошибки (хотя один кейс с логированием должен быть))
 @DisplayName("Branching")
 public class BranchingTest extends AbstractAcceptanceTest {
@@ -60,7 +63,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Создаю ветку [sample_branch]",
-                    "[omniutils] Ветка [sample_branch] уже существует",
+                    error("[omniutils] Ветка [sample_branch] уже существует"),
                     "[omniloan] Ветка [sample_branch] успешно создана",
                     "Создание ветки [sample_branch] завершено"
             );
@@ -93,7 +96,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Создаю ветку [sample_branch]",
-                    "[omniutils] Не удалось создать ветку [sample_branch]",
+                    error("[omniutils] Не удалось создать ветку [sample_branch]"),
                     "[omniloan] Ветка [sample_branch] успешно создана",
                     "Создание ветки [sample_branch] завершено"
             );
@@ -157,7 +160,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Удаляю ветку [sample_branch]",
-                    "[omniutils] Ветка [sample_branch] не существует",
+                    warn("[omniutils] Ветка [sample_branch] не существует"),
                     "[omniloan] Ветка [sample_branch] успешно удалена",
                     "Удаление ветки [sample_branch] завершено"
             );
@@ -187,7 +190,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Удаляю ветку [sample_branch]",
-                    "[omniutils] Не удалось удалить ветку [sample_branch]",
+                    error("[omniutils] Не удалось удалить ветку [sample_branch]"),
                     "[omniloan] Ветка [sample_branch] успешно удалена",
                     "Удаление ветки [sample_branch] завершено"
             );
@@ -259,7 +262,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Переименовываю ветку в [new_sample_branch]",
-                    "[omniutils] Не удалось переименовать ветку [branch_0] в [new_sample_branch]",
+                    error("[omniutils] Не удалось переименовать ветку [branch_0] в [new_sample_branch]"),
                     "[omniloan] Ветка [branch_1] успешно переименована в [new_sample_branch]",
                     "Переименовывание ветки в [new_sample_branch] завершено"
             );
@@ -336,7 +339,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Произвожу отмену мержа/черри-пика",
-                    "[omniutils] Нет мержа/черри-пика для отмены в [sample_branch]",
+                    error("[omniutils] Нет мержа/черри-пика для отмены в [sample_branch]"),
                     "[omniloan] Мерж/черри-пик успешно отменен в [sample_branch]",
                     "Отмена мержа/черри-пика завершена"
             );
@@ -373,7 +376,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Произвожу отмену мержа/черри-пика",
-                    "[omniutils] Нет мержа/черри-пика для отмены в [sample_branch]",
+                    error("[omniutils] Нет мержа/черри-пика для отмены в [sample_branch]"),
                     "[omniloan] Мерж/черри-пик успешно отменен в [sample_branch]",
                     "Отмена мержа/черри-пика завершена"
             );
@@ -410,7 +413,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Произвожу отмену мержа/черри-пика",
-                    "[omniutils] Не удалось отменить мерж/черри-пик в [sample_branch]",
+                    error("[omniutils] Не удалось отменить мерж/черри-пик в [sample_branch]"),
                     "[omniloan] Мерж/черри-пик успешно отменен в [sample_branch]",
                     "Отмена мержа/черри-пика завершена"
             );
@@ -446,7 +449,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Произвожу отмену мержа/черри-пика",
-                    "[omniutils] Не удалось отменить мерж/черри-пик в [sample_branch]",
+                    error("[omniutils] Не удалось отменить мерж/черри-пик в [sample_branch]"),
                     "[omniloan] Мерж/черри-пик успешно отменен в [sample_branch]",
                     "Отмена мержа/черри-пика завершена"
             );
@@ -532,7 +535,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Перехожу в ветку [sample_branch]",
-                    "[omniutils] Ветка [sample_branch] не найдена",
+                    error("[omniutils] Ветка [sample_branch] не найдена"),
                     "[omniloan] Переход в ветку [sample_branch] успешно завершен",
                     "Переход в ветку [sample_branch] завершен"
             );
@@ -572,7 +575,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Перехожу в ветку [sample_branch]",
-                    "[omniutils] Не удалось перейти в ветку [sample_branch]",
+                    error("[omniutils] Не удалось перейти в ветку [sample_branch]"),
                     "[omniloan] Переход в ветку [sample_branch] успешно завершен",
                     "Переход в ветку [sample_branch] завершен"
             );
@@ -658,7 +661,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Перехожу в ветку [sample_branch]",
-                    "[omniutils] Не удалось перейти в ветку [sample_branch]",
+                    error("[omniutils] Не удалось перейти в ветку [sample_branch]"),
                     "[omniloan] Переход в ветку [sample_branch] успешно завершен",
                     "Переход в ветку [sample_branch] завершен"
             );
@@ -700,7 +703,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Перехожу в ветку [sample_branch]",
-                    "[omniutils] Не удалось перейти в ветку [sample_branch]",
+                    error("[omniutils] Не удалось перейти в ветку [sample_branch]"),
                     "[omniloan] Переход в ветку [sample_branch] успешно завершен",
                     "Переход в ветку [sample_branch] завершен"
             );
@@ -742,7 +745,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Перехожу в ветку [sample_branch]",
-                    "[omniutils] Не удалось перейти в ветку [sample_branch]",
+                    error("[omniutils] Не удалось перейти в ветку [sample_branch]"),
                     "[omniloan] Переход в ветку [sample_branch] успешно завершен",
                     "Переход в ветку [sample_branch] завершен"
             );
@@ -785,7 +788,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Перехожу в ветку [sample_branch]",
-                    "[omniutils] Не удалось перейти в ветку [sample_branch]",
+                    error("[omniutils] Не удалось перейти в ветку [sample_branch]"),
                     "[omniloan] Переход в ветку [sample_branch] успешно завершен",
                     "Переход в ветку [sample_branch] завершен"
             );
@@ -861,7 +864,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Откатываюсь на текущий коммит",
-                    "[omniutils] Не удалось откатиться на текущий коммит в ветке [sample_branch]",
+                    error("[omniutils] Не удалось откатиться на текущий коммит в ветке [sample_branch]"),
                     "[omniloan] Откат на текущий коммит в ветке [sample_branch] успешно завершен",
                     "Откат на текущий коммит завершен"
             );
@@ -938,7 +941,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Показываю изменения",
-                    "[omniutils] Не удалось показать изменения в ветке [sample_branch]",
+                    error("[omniutils] Не удалось показать изменения в ветке [sample_branch]"),
                     "[omniloan] Показываю изменения в ветке [sample_branch]",
                     "Показ изменений завершен"
             );
@@ -975,7 +978,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Показываю изменения",
-                    "[omniutils] Не удалось показать изменения в ветке [sample_branch]",
+                    error("[omniutils] Не удалось показать изменения в ветке [sample_branch]"),
                     "[omniloan] Показываю изменения в ветке [sample_branch]",
                     "Показ изменений завершен"
             );
@@ -1015,7 +1018,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Показываю изменения",
-                    "[omniutils] Не удалось показать изменения в ветке [sample_branch]",
+                    error("[omniutils] Не удалось показать изменения в ветке [sample_branch]"),
                     "[omniloan] Показываю изменения в ветке [sample_branch]",
                     "Показ изменений завершен"
             );
@@ -1057,7 +1060,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Показываю изменения",
-                    "[omniutils] Не удалось показать изменения в ветке [sample_branch]",
+                    error("[omniutils] Не удалось показать изменения в ветке [sample_branch]"),
                     "[omniloan] Показываю изменения в ветке [sample_branch]",
                     "Показ изменений завершен"
             );
@@ -1097,7 +1100,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Показываю изменения",
-                    "[omniutils] Вы уже просматриваете изменения в ветке [sample_branch]",
+                    warn("[omniutils] Вы уже просматриваете изменения в ветке [sample_branch]"),
                     "[omniloan] Показываю изменения в ветке [sample_branch]",
                     "Показ изменений завершен"
             );
@@ -1176,7 +1179,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Откатываю показ изменений",
-                    "[omniutils] Сейчас не производится показ изменений в ветке [sample_branch]",
+                    warn("[omniutils] Сейчас не производится показ изменений в ветке [sample_branch]"),
                     "[omniloan] Откат показа изменений в ветке [sample_branch] успешно завершен",
                     "Откат показа изменений завершен"
             );
@@ -1213,7 +1216,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Откатываю показ изменений",
-                    "[omniutils] Не удалось отменить показ изменений в ветке [sample_branch]",
+                    error("[omniutils] Не удалось отменить показ изменений в ветке [sample_branch]"),
                     "[omniloan] Откат показа изменений в ветке [sample_branch] успешно завершен",
                     "Откат показа изменений завершен"
             );

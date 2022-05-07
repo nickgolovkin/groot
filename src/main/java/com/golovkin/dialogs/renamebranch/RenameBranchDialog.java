@@ -12,6 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static com.golovkin.common.ColorUtils.error;
+import static com.golovkin.common.PrintUtils.printf;
+
 public class RenameBranchDialog extends AbstractDialog<RenameBranchDialogInput, RenameBranchDialogInputParser> {
     private final static Logger LOGGER = LoggerFactory.getLogger(RenameBranchDialog.class);
 
@@ -26,7 +29,7 @@ public class RenameBranchDialog extends AbstractDialog<RenameBranchDialogInput, 
 
         String branchName = input.getName();
 
-        System.out.printf("Переименовываю ветку в [%s]\n", branchName);
+        printf("Переименовываю ветку в [%s]", branchName);
 
         for (ProjectEntry projectEntry : getProjectEntries()) {
             String projectName = projectEntry.getName();
@@ -35,15 +38,15 @@ public class RenameBranchDialog extends AbstractDialog<RenameBranchDialogInput, 
             try {
                 RenameBranchGitCommandInput commandInput = new RenameBranchGitCommandInput(branchName, projectEntry.getDirectory());
                 renameBranchGitCommand.execute(commandInput);
-                System.out.printf("[%s] Ветка [%s] успешно переименована в [%s]\n", projectName, currentBranchName, branchName);
+                printf("[%s] Ветка [%s] успешно переименована в [%s]", projectName, currentBranchName, branchName);
                 LOGGER.info("[{}] Переименование ветки [{}] в [{}]. Ветка успешно переименована. Команды - [{}]", projectName, currentBranchName, branchName, getGit().getLastExecutedCommandsAsString());
             } catch (Exception e) {
-                System.out.printf("[%s] Не удалось переименовать ветку [%s] в [%s]\n", projectName, currentBranchName, branchName);
+                printf(error("[%s] Не удалось переименовать ветку [%s] в [%s]"), projectName, currentBranchName, branchName);
                 LOGGER.error("[{}] Переименование ветки [{}] в [{}]. Не удалось переименовать ветку. Причина ошибки - [{}]. Команды - [{}]", projectName, currentBranchName, branchName, e.getMessage(), getGit().getLastExecutedCommandsAsString());
             }
         }
 
-        System.out.printf("Переименовывание ветки в [%s] завершено\n", branchName);
+        printf("Переименовывание ветки в [%s] завершено", branchName);
     }
 
     @Override

@@ -15,6 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static com.golovkin.common.ColorUtils.error;
+import static com.golovkin.common.PrintUtils.printf;
+
 public class CheckoutDialog extends AbstractDialog<CheckoutDialogInput, CheckoutDialogInputParser> {
     private final static Logger LOGGER = LoggerFactory.getLogger(CheckoutDialog.class);
 
@@ -30,7 +33,7 @@ public class CheckoutDialog extends AbstractDialog<CheckoutDialogInput, Checkout
 
         String branchName = input.getBranchName();
 
-        System.out.printf("Перехожу в ветку [%s]\n", branchName);
+        printf("Перехожу в ветку [%s]", branchName);
 
         for (ProjectEntry projectEntry : getProjectEntries()) {
             String projectName = projectEntry.getName();
@@ -40,7 +43,7 @@ public class CheckoutDialog extends AbstractDialog<CheckoutDialogInput, Checkout
                 CheckoutGitCommandInput commandInput = new CheckoutGitCommandInput(branchName, projectEntry.getDirectory());
                 CheckoutGitCommandOutput commandOutput = checkoutGitCommand.execute(commandInput);
 
-                System.out.printf("[%s] Переход в ветку [%s] успешно завершен\n", projectName, branchName);
+                printf("[%s] Переход в ветку [%s] успешно завершен", projectName, branchName);
 
                 if (commandOutput.isNothingToCommit()) {
                     LOGGER.info("[{}] Переход из ветки [{}] в ветку [{}]. Переход в ветку [{}] успешно завершен (несохраненных изменений не было). Команды - [{}]",
@@ -50,17 +53,17 @@ public class CheckoutDialog extends AbstractDialog<CheckoutDialogInput, Checkout
                             projectName, currentBranchName, branchName, branchName, getGit().getLastExecutedCommandsAsString());
                 }
             } catch (RefNotExistsException e) {
-                System.out.printf("[%s] Ветка [%s] не найдена\n", projectName, branchName);
+                printf(error("[%s] Ветка [%s] не найдена"), projectName, branchName);
                 LOGGER.error("[{}] Переход из ветки [{}] в ветку [{}]. Ветка [{}] не найдена. Команды - [{}]",
                         projectName, currentBranchName, branchName, branchName, getGit().getLastExecutedCommandsAsString());
             } catch (Exception e) {
-                System.out.printf("[%s] Не удалось перейти в ветку [%s]\n", projectName, branchName);
+                printf(error("[%s] Не удалось перейти в ветку [%s]"), projectName, branchName);
                 LOGGER.error("[{}] Переход из ветки [{}] в ветку [{}]. Не удалось перейти в ветку [{}]. Причина ошибки - [{}]. Команды - [{}]",
                         projectName, currentBranchName, branchName, branchName, e.getMessage(), getGit().getLastExecutedCommandsAsString());
             }
         }
 
-        System.out.printf("Переход в ветку [%s] завершен\n", branchName);
+        printf("Переход в ветку [%s] завершен", branchName);
     }
 
     @Override

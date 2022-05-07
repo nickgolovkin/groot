@@ -15,6 +15,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static com.golovkin.common.ColorUtils.error;
+import static com.golovkin.common.ColorUtils.warn;
+import static com.golovkin.common.PrintUtils.printf;
+
 public class ShowChangesDialog extends AbstractDialog<ShowChangesDialogInput, ShowChangesDialogInputParser> {
     private final static Logger LOGGER = LoggerFactory.getLogger(ShowChangesDialog.class);
 
@@ -36,13 +40,13 @@ public class ShowChangesDialog extends AbstractDialog<ShowChangesDialogInput, Sh
             try {
                 ShowChangesGitCommandInput commandInput = new ShowChangesGitCommandInput(currentBranchName, projectEntry.getDirectory());
                 showChangesGitCommand.execute(commandInput);
-                System.out.printf("[%s] Показываю изменения в ветке [%s]\n", projectName, currentBranchName);
+                printf("[%s] Показываю изменения в ветке [%s]", projectName, currentBranchName);
                 LOGGER.info("[{}] Показ изменений в ветке [{}]. Команды - [{}]", projectName, currentBranchName, getGit().getLastExecutedCommandsAsString());
             } catch (ChangesAlreadyShowingException e) {
-                System.out.printf("[%s] Вы уже просматриваете изменения в ветке [%s]\n", projectName, currentBranchName);
+                printf(warn("[%s] Вы уже просматриваете изменения в ветке [%s]"), projectName, currentBranchName);
                 LOGGER.warn("[{}] Показ изменений в ветке [{}]. Уже идет показ изменений. Команды - [{}]", projectName, currentBranchName, getGit().getLastExecutedCommandsAsString());
             } catch (Exception e) {
-                System.out.printf("[%s] Не удалось показать изменения в ветке [%s]\n", projectName, currentBranchName);
+                printf(error("[%s] Не удалось показать изменения в ветке [%s]"), projectName, currentBranchName);
                 LOGGER.error("[{}] Показ изменений в ветке [{}]. Не удалось показать изменения. Причина ошибки - [{}]. Команды - [{}]", projectName, currentBranchName, e.getMessage(), getGit().getLastExecutedCommandsAsString());
             }
         }

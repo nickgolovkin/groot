@@ -14,6 +14,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static com.golovkin.common.ColorUtils.error;
+import static com.golovkin.common.ColorUtils.warn;
+import static com.golovkin.common.PrintUtils.printf;
+
 public class UnshowChangesDialog extends AbstractDialog<UnshowChangesDialogInput, UnshowChangesDialogInputParser> {
     private final static Logger LOGGER = LoggerFactory.getLogger(UnshowChangesDialog.class);
 
@@ -36,13 +40,13 @@ public class UnshowChangesDialog extends AbstractDialog<UnshowChangesDialogInput
             try {
                 UnshowChangesGitCommandInput commandInput = new UnshowChangesGitCommandInput(currentBranchName, projectEntry.getDirectory());
                 unshowChangesGitCommand.execute(commandInput);
-                System.out.printf("[%s] Откат показа изменений в ветке [%s] успешно завершен\n", projectName, currentBranchName);
+                printf("[%s] Откат показа изменений в ветке [%s] успешно завершен", projectName, currentBranchName);
                 LOGGER.info("[{}] Откат показа изменений в ветке [{}]. Команды - [{}]", projectName, currentBranchName, getGit().getLastExecutedCommandsAsString());
             } catch (NoActiveShowChangesException e) {
-                System.out.printf("[%s] Сейчас не производится показ изменений в ветке [%s]\n", projectName, currentBranchName);
+                printf(warn("[%s] Сейчас не производится показ изменений в ветке [%s]"), projectName, currentBranchName);
                 LOGGER.warn("[{}] Откат показа изменений в ветке [{}]. Сейчас не производится показ изменений. Команды - [{}]", projectName, currentBranchName, getGit().getLastExecutedCommandsAsString());
             } catch (Exception e) {
-                System.out.printf("[%s] Не удалось отменить показ изменений в ветке [%s]\n", projectName, currentBranchName);
+                printf(error("[%s] Не удалось отменить показ изменений в ветке [%s]"), projectName, currentBranchName);
                 LOGGER.error("[{}] Откат показа изменений в ветке [{}]. Не удалось отменить показ изменений. Причина ошибки - [{}]. Команды - [{}]", projectName, currentBranchName, e.getMessage(), getGit().getLastExecutedCommandsAsString());
             }
         }

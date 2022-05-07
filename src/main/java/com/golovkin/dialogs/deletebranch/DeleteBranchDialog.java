@@ -11,6 +11,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static com.golovkin.common.ColorUtils.error;
+import static com.golovkin.common.ColorUtils.warn;
+import static com.golovkin.common.PrintUtils.printf;
+
 public class DeleteBranchDialog extends AbstractDialog<DeleteBranchDialogInput, DeleteBranchDialogInputParser> {
     private final static Logger LOGGER = LoggerFactory.getLogger(DeleteBranchDialog.class);
 
@@ -24,7 +28,7 @@ public class DeleteBranchDialog extends AbstractDialog<DeleteBranchDialogInput, 
 
         String branchName = input.getName();
 
-        System.out.printf("Удаляю ветку [%s]\n", branchName);
+        printf("Удаляю ветку [%s]", branchName);
 
         for (ProjectEntry projectEntry : getProjectEntries()) {
             String projectName = projectEntry.getName();
@@ -32,18 +36,18 @@ public class DeleteBranchDialog extends AbstractDialog<DeleteBranchDialogInput, 
             try {
                 DeleteBranchGitCommandInput commandInput = new DeleteBranchGitCommandInput(branchName, projectEntry.getDirectory());
                 deleteBranchGitCommand.execute(commandInput);
-                System.out.printf("[%s] Ветка [%s] успешно удалена\n", projectName, branchName);
+                printf("[%s] Ветка [%s] успешно удалена", projectName, branchName);
                 LOGGER.info("[{}] Удаление ветки [{}]. Ветка успешно удалена. Команды - [{}]", projectName, branchName, getGit().getLastExecutedCommandsAsString());
             } catch (BranchNotFoundException e) {
-                System.out.printf("[%s] Ветка [%s] не существует\n", projectName, branchName);
+                printf(warn("[%s] Ветка [%s] не существует"), projectName, branchName);
                 LOGGER.warn("[{}] Удаление ветки [{}]. Ветка не существует. Команды - [{}]", projectName, branchName, getGit().getLastExecutedCommandsAsString());
             } catch (Exception e) {
-                System.out.printf("[%s] Не удалось удалить ветку [%s]\n", projectName, branchName);
+                printf(error("[%s] Не удалось удалить ветку [%s]"), projectName, branchName);
                 LOGGER.error("[{}] Удаление ветки [{}]. Не удалось удалить ветку. Причина ошибки - [{}]. Команды - [{}]", projectName, branchName, e.getMessage(), getGit().getLastExecutedCommandsAsString());
             }
         }
 
-        System.out.printf("Удаление ветки [%s] завершено\n", branchName);
+        printf("Удаление ветки [%s] завершено", branchName);
     }
 
     @Override

@@ -15,6 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static com.golovkin.common.ColorUtils.error;
+import static com.golovkin.common.PrintUtils.printf;
+
 public class ResetToCommitDialog extends AbstractDialog<ResetToCommitDialogInput, ResetToCommitDialogInputParser> {
     private final static Logger LOGGER = LoggerFactory.getLogger(ResetToCommitDialog.class);
 
@@ -36,10 +39,10 @@ public class ResetToCommitDialog extends AbstractDialog<ResetToCommitDialogInput
             try {
                 ResetToCommitGitCommandInput commandInput = new ResetToCommitGitCommandInput(projectEntry.getDirectory());
                 resetToCommitGitCommand.execute(commandInput);
-                System.out.printf("[%s] Откат на текущий коммит в ветке [%s] успешно завершен\n", projectName, currentBranchName);
+                printf("[%s] Откат на текущий коммит в ветке [%s] успешно завершен", projectName, currentBranchName);
                 LOGGER.info("[{}] Откат на текущий коммит в ветке [{}]. Откат на текущий коммит успешно завершен. Команды - [{}]", projectName, currentBranchName, getGit().getLastExecutedCommandsAsString());
             } catch (Exception e) {
-                System.out.printf("[%s] Не удалось откатиться на текущий коммит в ветке [%s]\n", projectName, currentBranchName);
+                printf(error("[%s] Не удалось откатиться на текущий коммит в ветке [%s]"), projectName, currentBranchName);
                 LOGGER.error("[{}] Откат на текущий коммит в ветке [{}]. Не удалось откатиться на текущий коммит. Причина ошибки - [{}]. Команды - [{}]", projectName, currentBranchName, e.getMessage(), getGit().getLastExecutedCommandsAsString());
             }
         }
