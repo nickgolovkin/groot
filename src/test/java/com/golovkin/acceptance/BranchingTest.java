@@ -882,13 +882,12 @@ public class BranchingTest extends AbstractAcceptanceTest {
     @DisplayName("show changes")
     @Nested
     public class ShowChanges {
-        // TODO ТУТ НЕ CHECKOUT, а --soft reset!
         @Test
         public void success() {
             gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
                     .add("-C (.+) --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Created from HEAD", 0)
                     .add("-C (.+) commit --allow-empty -a -m \\[GROOT\\] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
-                    .add("-C (.+) checkout (.+)", "", 0)
+                    .add("-C (.+) reset --soft (.+)", "", 0)
                     .create();
 
             groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
@@ -908,16 +907,16 @@ public class BranchingTest extends AbstractAcceptanceTest {
                     "-C omniutils_dir status",
                     "-C omniutils_dir --no-pager reflog show --no-abbrev sample_branch",
                     "-C omniutils_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
-                    "-C omniutils_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2",
+                    "-C omniutils_dir reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2",
                     "-C omniloan_dir status",
                     "-C omniloan_dir --no-pager reflog show --no-abbrev sample_branch",
                     "-C omniloan_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
-                    "-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2"
+                    "-C omniloan_dir reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2"
                     );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniutils_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniutils_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
+                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniutils_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniutils_dir\" reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2]")
             );
         }
 
@@ -927,7 +926,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
                     .add("-C omniutils_dir --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Moved from HEAD", 0)
                     .add("-C omniloan_dir --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Created from HEAD", 0)
                     .add("-C (.+) commit --allow-empty -a -m \\[GROOT\\] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
-                    .add("-C (.+) checkout (.+)", "", 0)
+                    .add("-C (.+) reset --soft (.+)", "", 0)
                     .create();
 
             groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
@@ -949,12 +948,12 @@ public class BranchingTest extends AbstractAcceptanceTest {
                     "-C omniloan_dir status",
                     "-C omniloan_dir --no-pager reflog show --no-abbrev sample_branch",
                     "-C omniloan_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
-                    "-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2"
+                    "-C omniloan_dir reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2"
                     );
 
             check().assertLogsEqual(
                     new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [Не удалось найти начало ветки]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2]")
             );
         }
 
@@ -964,7 +963,7 @@ public class BranchingTest extends AbstractAcceptanceTest {
                     .add("-C (.+) --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Created from HEAD", 0)
                     .add("-C omniutils_dir commit --allow-empty -a -m \\[GROOT\\] ~Show changes checkpoint~", "some unexpected\nerror", 1)
                     .add("-C omniloan_dir commit --allow-empty -a -m \\[GROOT\\] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
-                    .add("-C (.+) checkout (.+)", "", 0)
+                    .add("-C (.+) reset --soft (.+)", "", 0)
                     .create();
 
             groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
@@ -987,12 +986,12 @@ public class BranchingTest extends AbstractAcceptanceTest {
                     "-C omniloan_dir status",
                     "-C omniloan_dir --no-pager reflog show --no-abbrev sample_branch",
                     "-C omniloan_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
-                    "-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2"
+                    "-C omniloan_dir reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2"
                     );
 
             check().assertLogsEqual(
                     new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniutils_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\"]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2]")
             );
         }
 
@@ -1001,10 +1000,10 @@ public class BranchingTest extends AbstractAcceptanceTest {
             gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
                     .add("-C (.+) --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Created from HEAD", 0)
                     .add("-C (.+) commit --allow-empty -a -m \\[GROOT\\] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
-                    .add("-C omniutils_dir checkout (.+)", "some unexpected\nerror", 1)
+                    .add("-C omniutils_dir reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2", "some unexpected\nerror", 1)
                     .add("-C omniutils_dir reset --hard 711fbea", "", 0)
                     .add("-C omniutils_dir reset --soft HEAD~1", "", 0)
-                    .add("-C omniloan_dir checkout (.+)", "", 0)
+                    .add("-C omniloan_dir reset --soft (.+)", "", 0)
                     .create();
 
             groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
@@ -1024,18 +1023,18 @@ public class BranchingTest extends AbstractAcceptanceTest {
                     "-C omniutils_dir status",
                     "-C omniutils_dir --no-pager reflog show --no-abbrev sample_branch",
                     "-C omniutils_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
-                    "-C omniutils_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2",
+                    "-C omniutils_dir reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2",
                     "-C omniutils_dir reset --hard 711fbea",
                     "-C omniutils_dir reset --soft HEAD~1",
                     "-C omniloan_dir status",
                     "-C omniloan_dir --no-pager reflog show --no-abbrev sample_branch",
                     "-C omniloan_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
-                    "-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2"
+                    "-C omniloan_dir reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2"
                     );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniutils_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniutils_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2;-C \"omniutils_dir\" reset --hard 711fbea;-C \"omniutils_dir\" reset --soft HEAD~1]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniutils_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniutils_dir\" reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2;-C \"omniutils_dir\" reset --hard 711fbea;-C \"omniutils_dir\" reset --soft HEAD~1]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2]")
             );
         }
 
@@ -1044,9 +1043,9 @@ public class BranchingTest extends AbstractAcceptanceTest {
             gitStub().add("-C (.+) status", "On branch sample_branch\nnothing to commit, working tree clean", 0)
                     .add("-C (.+) --no-pager reflog show --no-abbrev sample_branch", "cc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{0}: reset: moving to HEAD~1\ne66a2a8b0fae2fa67ca8d874ad27a3a5bbca77cf branch_2@{1}: commit: kek\ncc12db8403863270da16d306b5e7aea2ea6121b2 (HEAD -> branch_2, branch_1) branch_2@{2}: branch: Created from HEAD", 0)
                     .add("-C (.+) commit --allow-empty -a -m \\[GROOT\\] ~Show changes checkpoint~", "[branch_2 711fbea] [GROOT] ~Show changes checkpoint~", 0)
-                    .add("-C omniutils_dir checkout (.+)", "some unexpected\nerror", 1)
+                    .add("-C omniutils_dir reset --soft (.+)", "some unexpected\nerror", 1)
                     .add("-C omniutils_dir reset --hard 711fbea", "another error", 1)
-                    .add("-C omniloan_dir checkout (.+)", "", 0)
+                    .add("-C omniloan_dir reset --soft (.+)", "", 0)
                     .create();
 
             groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
@@ -1066,17 +1065,17 @@ public class BranchingTest extends AbstractAcceptanceTest {
                     "-C omniutils_dir status",
                     "-C omniutils_dir --no-pager reflog show --no-abbrev sample_branch",
                     "-C omniutils_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
-                    "-C omniutils_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2",
+                    "-C omniutils_dir reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2",
                     "-C omniutils_dir reset --hard 711fbea",
                     "-C omniloan_dir status",
                     "-C omniloan_dir --no-pager reflog show --no-abbrev sample_branch",
                     "-C omniloan_dir commit --allow-empty -a -m [GROOT] ~Show changes checkpoint~",
-                    "-C omniloan_dir checkout cc12db8403863270da16d306b5e7aea2ea6121b2"
+                    "-C omniloan_dir reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2"
                     );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniutils_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniutils_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2;-C \"omniutils_dir\" reset --hard 711fbea]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" checkout cc12db8403863270da16d306b5e7aea2ea6121b2]")
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Показ изменений в ветке [sample_branch]. Не удалось показать изменения. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniutils_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniutils_dir\" reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2;-C \"omniutils_dir\" reset --hard 711fbea]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Показ изменений в ветке [sample_branch]. Команды - [-C \"omniloan_dir\" --no-pager reflog show --no-abbrev sample_branch;-C \"omniloan_dir\" commit --allow-empty -a -m \"[GROOT] ~Show changes checkpoint~\";-C \"omniloan_dir\" reset --soft cc12db8403863270da16d306b5e7aea2ea6121b2]")
             );
         }
     }

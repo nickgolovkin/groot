@@ -30,7 +30,7 @@ public class ShowChangesGitCommand extends AbstractGitCommand<ShowChangesGitComm
         String checkpointHash = getGit().commit(projectDirectoryPath, "[GROOT] ~Show changes checkpoint~", true);
 
         try {
-            getGit().checkout(projectDirectoryPath, branchStartHash);
+            getGit().softReset(projectDirectoryPath, branchStartHash);
         } catch (GitException e) {
             try {
                 getGit().hardReset(projectDirectoryPath, checkpointHash);
