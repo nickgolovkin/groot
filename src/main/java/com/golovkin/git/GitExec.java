@@ -2,6 +2,7 @@ package com.golovkin.git;
 
 import com.golovkin.common.exceptions.TimeoutException;
 import com.golovkin.git.exceptions.GitException;
+import org.apache.commons.text.StringTokenizer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,10 +24,10 @@ public class GitExec {
 
     public void run(String command) {
         try {
-            // TODO серьезно подумать над токенизацией передающихся в Git команд. Правила такие - если токен начинается с ", то все в "" нужно интерпретировать, как один токен. Либо, конечно, можешь явно их посылать
             lastExecutedCommands.add(command);
             String consoleCommand = String.format("%s %s", path.toString(), command);
-            process = Runtime.getRuntime().exec(consoleCommand);
+
+            process = startProcess(consoleCommand);
 
             if (!process.waitFor(1, TimeUnit.SECONDS)) {
                 process.destroyForcibly();
@@ -39,6 +40,15 @@ public class GitExec {
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private Process startProcess(String command) throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder(tokenize(command));
+        return processBuilder.start();
+    }
+
+    private String[] tokenize(String input) {
+        return new StringTokenizer(input, ' ', '"').getTokenArray();
     }
 
     public List<String> getOutput() {

@@ -28,7 +28,7 @@ public class Git {
 
     public void createBranch(String projectDirectoryPath, String name) {
         try {
-            gitExec.run(String.format("--git-dir %s/.git branch %s", escapePath(projectDirectoryPath), name));
+            gitExec.run(String.format("-C \"%s\" branch %s", projectDirectoryPath, name));
         } catch (GitException e) {
             if (RegexUtils.contains(e.getMessage(), BRANCH_ALREADY_EXISTS_PATTERN)) {
                 throw new BranchAlreadyExistsException(name);
@@ -40,7 +40,7 @@ public class Git {
 
     public void deleteBranch(String projectDirectoryPath, String name) {
         try {
-            gitExec.run(String.format("--git-dir %s/.git branch -D %s", escapePath(projectDirectoryPath), name));
+            gitExec.run(String.format("-C \"%s\" branch -D %s", projectDirectoryPath, name));
         } catch (GitException e) {
             if (RegexUtils.contains(e.getMessage(), BRANCH_NOT_FOUND_PATTERN)) {
                 throw new BranchNotFoundException(name);
@@ -51,12 +51,12 @@ public class Git {
     }
 
     public void renameBranch(String projectDirectoryPath, String name) {
-        gitExec.run(String.format("--git-dir %s/.git branch -M %s", escapePath(projectDirectoryPath), name));
+        gitExec.run(String.format("-C \"%s\" branch -M %s", projectDirectoryPath, name));
     }
 
     public void abortMerge(String projectDirectoryPath) {
         try {
-            gitExec.run(String.format("--git-dir %s/.git merge --abort", escapePath(projectDirectoryPath)));
+            gitExec.run(String.format("-C \"%s\" merge --abort", projectDirectoryPath));
         } catch (GitException e) {
             if (RegexUtils.contains(e.getMessage(), NO_MERGE_TO_ABORT_PATTERN)) {
                 throw new NoMergeToAbortException();
@@ -68,7 +68,7 @@ public class Git {
 
     public void abortCherryPick(String projectDirectoryPath) {
         try {
-            gitExec.run(String.format("--git-dir %s/.git cherry-pick --abort", escapePath(projectDirectoryPath)));
+            gitExec.run(String.format("-C \"%s\" cherry-pick --abort", projectDirectoryPath));
         } catch (GitException e) {
             if (RegexUtils.contains(e.getMessage(), NO_CHERRY_PICK_TO_ABORT_PATTERN)) {
                 throw new NoCherryPickToAbortException();
@@ -79,18 +79,18 @@ public class Git {
     }
 
     public String status(String projectDirectoryPath) {
-        gitExec.run(String.format("--git-dir %s/.git status", escapePath(projectDirectoryPath)));
+        gitExec.run(String.format("-C \"%s\" status", projectDirectoryPath));
 
         return String.join(" ", gitExec.getOutput());
     }
 
     public void checkout(String projectDirectoryPath, String name) {
-        gitExec.run(String.format("--git-dir %s/.git checkout %s", escapePath(projectDirectoryPath), name));
+        gitExec.run(String.format("-C \"%s\" checkout %s", projectDirectoryPath, name));
     }
 
     public void verifyRefExists(String projectDirectoryPath, String name) {
         try {
-            gitExec.run(String.format("--git-dir %s/.git rev-parse --verify %s", projectDirectoryPath, name));
+            gitExec.run(String.format("-C \"%s\" rev-parse --verify %s", projectDirectoryPath, name));
         } catch (GitException e) {
             if (RegexUtils.contains(e.getMessage(), REF_NOT_EXISTS_PATTERN)) {
                 throw new RefNotExistsException(name);
@@ -102,7 +102,7 @@ public class Git {
 
     public void commit(String projectDirectoryPath, String message) {
         try {
-            gitExec.run(String.format("--git-dir %s/.git commit -a -m \"%s\"", projectDirectoryPath, message));
+            gitExec.run(String.format("-C \"%s\" commit -a -m \"%s\"", projectDirectoryPath, message));
         } catch (GitException e) {
             if (RegexUtils.contains(e.getMessage(), NOTHING_TO_COMMIT_PATTERN)) {
                 throw new NothingToCommitException();
@@ -113,12 +113,12 @@ public class Git {
     }
 
     public List<String> log(String projectDirectoryPath, int entryCount, String prettyFormat) {
-        gitExec.run(String.format("--git-dir %s/.git log -%d --pretty=\"%s\"", projectDirectoryPath, entryCount, prettyFormat));
+        gitExec.run(String.format("-C \"%s\" log -%d \"--pretty=%s\"", projectDirectoryPath, entryCount, prettyFormat));
         return gitExec.getOutput();
     }
 
     public void softReset(String projectDirectoryPath, String refName) {
-        gitExec.run(String.format("--git-dir %s/.git reset --soft %s", projectDirectoryPath, refName));
+        gitExec.run(String.format("-C \"%s\" reset --soft %s", projectDirectoryPath, refName));
     }
 
     public List<String> getLastExecutedCommands() {
@@ -131,9 +131,5 @@ public class Git {
 
     public void resetLastExecutedCommands() {
         gitExec.resetLastExecutedCommands();
-    }
-
-    private String escapePath(String path) {
-        return path.replace(" ", "\\ ");
     }
 }
