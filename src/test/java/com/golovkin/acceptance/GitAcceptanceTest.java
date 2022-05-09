@@ -1457,4 +1457,68 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
             );
         }
     }
+
+    @DisplayName("current branches")
+    @Nested
+    public class CurrentBranches {
+        @Test
+        public void successful_current_branch_name_retrieval() {
+            gitStub().add("-C omniutils_dir rev-parse --abbrev-ref HEAD", "feature/CBKZR-8000", 0)
+                    .add("-C omniloan_dir rev-parse --abbrev-ref HEAD", "feature/CBKZR-8001", 0)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("current branches");
+
+            check().assertOutputEqual(
+                    "Получаю названия веток",
+                    "[omniutils] feature/CBKZR-8000",
+                    "[omniloan] feature/CBKZR-8001",
+                    "Получение названия веток завершено"
+            );
+
+            check().assertGitRequestsEqual(
+                    "-C omniutils_dir rev-parse --abbrev-ref HEAD",
+                    "-C omniloan_dir rev-parse --abbrev-ref HEAD"
+            );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Получение названия текущей ветки. Название - [feature/CBKZR-8000]. Команды - [-C omniutils_dir rev-parse --abbrev-ref HEAD]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Получение названия текущей ветки. Название - [feature/CBKZR-8001]. Команды - [-C omniutils_dir rev-parse --abbrev-ref HEAD]")
+            );
+        }
+
+        @Test
+        public void cannot_retrieve_current_branch_name() {
+            gitStub().add("-C omniutils_dir rev-parse --abbrev-ref HEAD", "some unexpected\nerror", 1)
+                    .add("-C omniloan_dir rev-parse --abbrev-ref HEAD", "some unexpected\nerror", 1)
+                    .create();
+
+            groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
+                    .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
+                    .create();
+
+            groot().run("current branches");
+
+            check().assertOutputEqual(
+                    "Получаю названия веток",
+                    "[omniutils] Не удалось получить название ветки",
+                    "[omniloan] Не удалось получить название ветки",
+                    "Получение названия веток завершено"
+            );
+
+            check().assertGitRequestsEqual(
+                    "-C omniutils_dir rev-parse --abbrev-ref HEAD",
+                    "-C omniloan_dir rev-parse --abbrev-ref HEAD"
+            );
+
+            check().assertLogsEqual(
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Получение названия текущей ветки. Не удалось получить название. Причина ошибки - [some unexpected error]. Команды - [-C omniutils_dir rev-parse --abbrev-ref HEAD]"),
+                    new GrootLogEntry(LogLevel.ERROR, "[omniloan] Получение названия текущей ветки. Не удалось получить название. Причина ошибки - [some unexpected error]. Команды - [-C omniutils_dir rev-parse --abbrev-ref HEAD]")
+            );
+        }
+    }
 }
