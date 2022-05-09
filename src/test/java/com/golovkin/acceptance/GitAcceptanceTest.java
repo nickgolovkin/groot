@@ -1431,7 +1431,7 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
 
         @Test
         public void cannot_commit() {
-            gitStub().add("-C (.+) status", "On branch feature/CBKZR-8000\nnothing to commit, working tree clean", 0)
+            gitStub().add("-C (.+) status", "On branch feature/reject\nChanges to be committed:\n  (use \"git restore --staged <file>...\" to unstage)\n	modified:   file\n	new file:   ok\n", 0)
                     .add("-C (.+) commit -a -m (.+)", "some unexpected\nerror", 1)
                     .create();
 
