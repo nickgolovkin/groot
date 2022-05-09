@@ -63,7 +63,7 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Создаю ветку [sample_branch]",
-                    error("[omniutils] Ветка [sample_branch] уже существует"),
+                    warn("[omniutils] Ветка [sample_branch] уже существует"),
                     "[omniloan] Ветка [sample_branch] успешно создана",
                     "Создание ветки [sample_branch] завершено"
             );
@@ -339,7 +339,7 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Произвожу отмену мержа/черри-пика",
-                    error("[omniutils] Нет мержа/черри-пика для отмены в [sample_branch]"),
+                    warn("[omniutils] Нет мержа/черри-пика для отмены в [sample_branch]"),
                     "[omniloan] Мерж/черри-пик успешно отменен в [sample_branch]",
                     "Отмена мержа/черри-пика завершена"
             );
@@ -376,7 +376,7 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Произвожу отмену мержа/черри-пика",
-                    error("[omniutils] Нет мержа/черри-пика для отмены в [sample_branch]"),
+                    warn("[omniutils] Нет мержа/черри-пика для отмены в [sample_branch]"),
                     "[omniloan] Мерж/черри-пик успешно отменен в [sample_branch]",
                     "Отмена мержа/черри-пика завершена"
             );
