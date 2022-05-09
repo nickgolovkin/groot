@@ -139,6 +139,11 @@ public class Git {
         return gitExec.getOutput();
     }
 
+    public String getCurrentBranch(String projectDirectoryPath) {
+        gitExec.run(String.format("-C \"%s\" rev-parse --abbrev-ref HEAD", projectDirectoryPath));
+        return String.join(" ", gitExec.getOutput());
+    }
+
     public List<String> getLastExecutedCommands() {
         return gitExec.getLastExecutedCommands();
     }

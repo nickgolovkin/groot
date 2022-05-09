@@ -1486,8 +1486,8 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
             );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Получение названия текущей ветки. Название - [feature/CBKZR-8000]. Команды - [-C omniutils_dir rev-parse --abbrev-ref HEAD]"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Получение названия текущей ветки. Название - [feature/CBKZR-8001]. Команды - [-C omniutils_dir rev-parse --abbrev-ref HEAD]")
+                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Получение названия текущей ветки. Название - [feature/CBKZR-8000]. Команды - [-C \"omniutils_dir\" rev-parse --abbrev-ref HEAD]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Получение названия текущей ветки. Название - [feature/CBKZR-8001]. Команды - [-C \"omniloan_dir\" rev-parse --abbrev-ref HEAD]")
             );
         }
 
@@ -1505,8 +1505,8 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
 
             check().assertOutputEqual(
                     "Получаю названия веток",
-                    "[omniutils] Не удалось получить название ветки",
-                    "[omniloan] Не удалось получить название ветки",
+                    error("[omniutils] Не удалось получить название ветки"),
+                    error("[omniloan] Не удалось получить название ветки"),
                     "Получение названия веток завершено"
             );
 
@@ -1516,8 +1516,8 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
             );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Получение названия текущей ветки. Не удалось получить название. Причина ошибки - [some unexpected error]. Команды - [-C omniutils_dir rev-parse --abbrev-ref HEAD]"),
-                    new GrootLogEntry(LogLevel.ERROR, "[omniloan] Получение названия текущей ветки. Не удалось получить название. Причина ошибки - [some unexpected error]. Команды - [-C omniutils_dir rev-parse --abbrev-ref HEAD]")
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Получение названия текущей ветки. Не удалось получить название. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" rev-parse --abbrev-ref HEAD]"),
+                    new GrootLogEntry(LogLevel.ERROR, "[omniloan] Получение названия текущей ветки. Не удалось получить название. Причина ошибки - [some unexpected error]. Команды - [-C \"omniloan_dir\" rev-parse --abbrev-ref HEAD]")
             );
         }
     }

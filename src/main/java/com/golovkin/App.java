@@ -6,6 +6,7 @@ import com.golovkin.dialogs.AbstractDialog;
 import com.golovkin.dialogs.abort.AbortDialog;
 import com.golovkin.dialogs.checkout.CheckoutDialog;
 import com.golovkin.dialogs.commit.CommitDialog;
+import com.golovkin.dialogs.currentbranches.CurrentBranchesDialog;
 import com.golovkin.dialogs.deletebranch.DeleteBranchDialog;
 import com.golovkin.dialogs.renamebranch.RenameBranchDialog;
 import com.golovkin.dialogs.resettocommit.ResetToCommitDialog;
@@ -55,6 +56,7 @@ public class App
         abstractDialogs.put(ShowChangesDialog.class, new ShowChangesDialog(git, configuration.getProjectEntries()));
         abstractDialogs.put(UnshowChangesDialog.class, new UnshowChangesDialog(git, configuration.getProjectEntries()));
         abstractDialogs.put(CommitDialog.class, new CommitDialog(git, configuration.getProjectEntries(), configuration.getBranchNamePattern()));
+        abstractDialogs.put(CurrentBranchesDialog.class, new CurrentBranchesDialog(git, configuration.getProjectEntries()));
 
         return abstractDialogs;
     }
