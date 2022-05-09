@@ -1251,7 +1251,7 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
 
             groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
                     .withProjectEntry("omniloan", "omniloan_dir", "omniloan_url")
-                    .withBranchNamePattern("(feature|bugfix)\\/(?<task_number>[A-Z]+-[0-9]+)(_[0-9]+){0,1}")
+                    .withBranchNamePattern("(feature|bugfix)\\/(?<taskNumber>[A-Z]+-[0-9]+)(_[0-9]+){0,1}")
                     .create();
 
             groot().run("commit \"Отказ от транзакта\"");
@@ -1259,20 +1259,20 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
             check().assertOutputEqual(
                     "Коммичу",
                     "[omniutils] Коммит [CBKZR-8000 Отказ от транзакта] успешно выполнен [feature/CBKZR-8000_2]",
-                    "[omniutils] Коммит [CBKZR-8000 Отказ от транзакта] успешно выполнен [feature/CBKZR-8000]",
+                    "[omniloan] Коммит [CBKZR-8000 Отказ от транзакта] успешно выполнен [feature/CBKZR-8000]",
                     "Коммит завершен"
             );
 
             check().assertGitRequestsEqual(
                     "-C omniutils_dir status",
-                    "-C omniutils_dir commit -a -m Отказ от транзакта",
+                    "-C omniutils_dir commit -a -m CBKZR-8000 Отказ от транзакта",
                     "-C omniloan_dir status",
-                    "-C omniloan_dir commit -a -m Отказ от транзакта"
+                    "-C omniloan_dir commit -a -m CBKZR-8000 Отказ от транзакта"
             );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Коммит в ветке [feature/CBKZR-8080_2]. Коммит успешно выполенен. Сообщение - [CBKZR-8000 Отказ от транзакта]. Команды - []"),
-                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Коммит в ветке [feature/CBKZR-8080]. Коммит успешно выполенен. Сообщение - [CBKZR-8000 Отказ от транзакта]. Команды - []")
+                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Коммит в ветке [feature/CBKZR-8000_2]. Коммит успешно выполенен. Сообщение - [CBKZR-8000 Отказ от транзакта]. Команды - [-C \"omniutils_dir\" commit -a -m \"CBKZR-8000 Отказ от транзакта\"]"),
+                    new GrootLogEntry(LogLevel.INFO, "[omniloan] Коммит в ветке [feature/CBKZR-8000]. Коммит успешно выполенен. Сообщение - [CBKZR-8000 Отказ от транзакта]. Команды - [-C \"omniloan_dir\" commit -a -m \"CBKZR-8000 Отказ от транзакта\"]")
             );
         }
 
@@ -1287,7 +1287,7 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
             groot().run("commit \"CBKZR-8000 Отказ от транзакта\"");
 
             check().assertOutputEqual(
-                    "В конфигурации отсутствует шаблон названия ветки (член branchNamePattern)"
+                    error("В конфигурации отсутствует шаблон названия ветки (член branchNamePattern)")
             );
 
             check().assertGitRequestsEqual();
@@ -1309,13 +1309,13 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
             groot().run("commit \"CBKZR-8000 Отказ от транзакта\"");
 
             check().assertOutputEqual(
-                    "В шаблоне названия ветки отсутствует группа task_number (?<task_number>)"
+                    error("В шаблоне названия ветки отсутствует группа taskNumber (?<taskNumber>)")
             );
 
             check().assertGitRequestsEqual();
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.ERROR, "Коммит с сообщением [CBKZR-8000 Отказ от транзакта]. Не удалось выполнить коммит. В шаблоне названия ветки отсутствует группа task_number (?<task_number>). Шаблон названия ветки - []")
+                    new GrootLogEntry(LogLevel.ERROR, "Коммит с сообщением [CBKZR-8000 Отказ от транзакта]. Не удалось выполнить коммит. В шаблоне названия ветки отсутствует группа taskNumber (?<task_number>). Шаблон названия ветки - [(feature|bugfix)\\/([A-Z]+-[0-9]+)(_[0-9]+){0,1}]")
             );
         }
 
@@ -1326,7 +1326,7 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
                     .create();
 
             groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
-                    .withBranchNamePattern("(feature|bugfix)\\/(?<task_number>[A-Z]+-[0-9]+)(_[0-9]+){0,1}")
+                    .withBranchNamePattern("(feature|bugfix)\\/(?<taskNumber>[A-Z]+-[0-9]+)(_[0-9]+){0,1}")
                     .create();
 
             groot().run("commit \"CBKZR-8000 Отказ от транзакта\"");
@@ -1343,24 +1343,24 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
             );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Коммит в ветке [feature/CBKZR-8080_2]. Коммит успешно выполенен. Сообщение - [CBKZR-8000 Отказ от транзакта]. Команды - []")
+                    new GrootLogEntry(LogLevel.INFO, "[omniutils] Коммит в ветке [feature/CBKZR-8000_2]. Коммит успешно выполенен. Сообщение - [CBKZR-8000 Отказ от транзакта]. Команды - [-C \"omniutils_dir\" commit -a -m \"CBKZR-8000 Отказ от транзакта\"]")
             );
         }
 
         @Test
         public void task_number_from_commit_message_does_not_match_task_number_from_branch_name() {
-            gitStub().add("-C (.+) status", "On branch feature/CBKZR-8000\nChanges to be committed:\n  (use \"git restore --staged <file>...\" to unstage)\n	modified:   file\n	new file:   ok\n", 0)
+            gitStub().add("-C (.+) status", "On branch feature/CBKZR-8000_2\nChanges to be committed:\n  (use \"git restore --staged <file>...\" to unstage)\n	modified:   file\n	new file:   ok\n", 0)
                     .create();
 
             groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
-                    .withBranchNamePattern("(feature|bugfix)\\/(?<task_number>[A-Z]+-[0-9]+)(_[0-9]+){0,1}")
+                    .withBranchNamePattern("(feature|bugfix)\\/(?<taskNumber>[A-Z]+-[0-9]+)(_[0-9]+){0,1}")
                     .create();
 
             groot().run("commit \"CBKZR-8001 Отказ от транзакта\"");
 
             check().assertOutputEqual(
                     "Коммичу",
-                    "[omniutils] Номер таски в сообщении коммита [CBKZR-8001 Отказ от транзакта] не совпадает с номером таски в названии ветки [CBKZR-8000]",
+                    error("[omniutils] Номер таски в сообщении коммита [CBKZR-8001] не совпадает с номером таски в названии ветки [CBKZR-8000]"),
                     "Коммит завершен"
             );
 
@@ -1369,7 +1369,7 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
             );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Коммит в ветке [feature/CBKZR-8080_2]. Не удалось выполнить коммит. Номер таски в сообщении коммита [CBKZR-8001 Отказ от транзакта] не совпадает с номером таски в названии ветки [CBKZR-8000]. Команды - []")
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Коммит в ветке [feature/CBKZR-8000_2]. Не удалось выполнить коммит. Номер таски в сообщении коммита [CBKZR-8001] не совпадает с номером таски в названии ветки [CBKZR-8000]. Команды - []")
             );
         }
 
@@ -1380,7 +1380,7 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
                     .create();
 
             groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
-                    .withBranchNamePattern("(feature|bugfix)\\/(?<task_number>[A-Z]+-[0-9]+)(_[0-9]+){0,1}")
+                    .withBranchNamePattern("(feature|bugfix)\\/(?<taskNumber>[A-Z]+-[0-9]+)(_[0-9]+){0,1}")
                     .create();
 
             groot().run("commit \"Отказ от транзакта\"");
@@ -1397,7 +1397,7 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
             );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.WARN, "[omniutils] Коммит в ветке [feature/reject]. Коммит успешно выполнен. Не удалось определить номер таски из ветки, использовано сообщение коммита в исходном виде. Команды - []")
+                    new GrootLogEntry(LogLevel.WARN, "[omniutils] Коммит в ветке [feature/reject]. Коммит успешно выполнен. Не удалось определить номер таски из ветки, использовано сообщение коммита в исходном виде. Сообщение - [Отказ от транзакта]. Команды - [-C \"omniutils_dir\" commit -a -m \"Отказ от транзакта\"]")
             );
         }
 
@@ -1408,52 +1408,52 @@ public class GitAcceptanceTest extends AbstractAcceptanceTest {
                     .create();
 
             groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
-                    .withBranchNamePattern("(feature|bugfix)\\/(?<task_number>[A-Z]+-[0-9]+)(_[0-9]+){0,1}")
+                    .withBranchNamePattern("(feature|bugfix)\\/(?<taskNumber>[A-Z]+-[0-9]+)(_[0-9]+){0,1}")
                     .create();
 
             groot().run("commit \"Отказ от транзакта\"");
 
             check().assertOutputEqual(
                     "Коммичу",
-                    "В ветке [feature/CBKZR-8000] не было изменений",
+                    warn("[omniutils] В ветке [feature/CBKZR-8000] не было изменений"),
                     "Коммит завершен"
             );
 
             check().assertGitRequestsEqual(
                     "-C omniutils_dir status",
-                    "-C omniutils_dir commit -a -m Отказ от транзакта"
+                    "-C omniutils_dir commit -a -m CBKZR-8000 Отказ от транзакта"
             );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.WARN, "[omniutils] Коммит в ветке [feature/reject]. Коммит успешно выполнен. Не удалось определить номер таски из ветки, использовано сообщение коммита в исходном виде. Команды - []")
+                    new GrootLogEntry(LogLevel.WARN, "[omniutils] Коммит в ветке [feature/CBKZR-8000]. В ветке не было изменений. Команды - [-C \"omniutils_dir\" commit -a -m \"CBKZR-8000 Отказ от транзакта\"]")
             );
         }
 
         @Test
         public void cannot_commit() {
-            gitStub().add("-C (.+) status", "On branch feature/reject\nChanges to be committed:\n  (use \"git restore --staged <file>...\" to unstage)\n	modified:   file\n	new file:   ok\n", 0)
+            gitStub().add("-C (.+) status", "On branch feature/CBKZR-8000_2\nChanges to be committed:\n  (use \"git restore --staged <file>...\" to unstage)\n	modified:   file\n	new file:   ok\n", 0)
                     .add("-C (.+) commit -a -m (.+)", "some unexpected\nerror", 1)
                     .create();
 
             groot().withProjectEntry("omniutils", "omniutils_dir", "omniutils_url")
-                    .withBranchNamePattern("(feature|bugfix)\\/(?<task_number>[A-Z]+-[0-9]+)(_[0-9]+){0,1}")
+                    .withBranchNamePattern("(feature|bugfix)\\/(?<taskNumber>[A-Z]+-[0-9]+)(_[0-9]+){0,1}")
                     .create();
 
             groot().run("commit \"Отказ от транзакта\"");
 
             check().assertOutputEqual(
                     "Коммичу",
-                    "Не удалось выполнить коммит в ветке [feature/reject]",
+                    error("[omniutils] Не удалось выполнить коммит в ветке [feature/CBKZR-8000_2]"),
                     "Коммит завершен"
             );
 
             check().assertGitRequestsEqual(
                     "-C omniutils_dir status",
-                    "-C omniutils_dir commit -a -m Отказ от транзакта"
+                    "-C omniutils_dir commit -a -m CBKZR-8000 Отказ от транзакта"
             );
 
             check().assertLogsEqual(
-                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Коммит в ветке [feature/CBKZR-8080_2]. Не удалось выполнить коммит. Причина ошибки - []. Команды - []")
+                    new GrootLogEntry(LogLevel.ERROR, "[omniutils] Коммит в ветке [feature/CBKZR-8000_2]. Не удалось выполнить коммит. Причина ошибки - [some unexpected error]. Команды - [-C \"omniutils_dir\" commit -a -m \"CBKZR-8000 Отказ от транзакта\"]")
             );
         }
     }

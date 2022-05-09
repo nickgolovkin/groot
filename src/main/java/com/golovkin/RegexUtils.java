@@ -9,6 +9,10 @@ public class RegexUtils {
     }
 
     public static String extractSubstring(String input, Pattern pattern, String groupName) {
+        if (input == null) {
+            return null;
+        }
+
         Matcher matcher = pattern.matcher(input);
         if (matcher.find()) {
             return matcher.group(groupName);
@@ -21,7 +25,24 @@ public class RegexUtils {
         return extractSubstring(input, Pattern.compile(pattern), groupName);
     }
 
+    public static String extractFirstOccurrence(String input, Pattern pattern) {
+        if (input == null) {
+            return null;
+        }
+
+        Matcher matcher = pattern.matcher(input);
+        if (matcher.find()) {
+            return matcher.group(0);
+        }
+
+        return null;
+    }
+
     public static String extractFirstSubstring(List<String> input, Pattern pattern, String groupName) {
+        if (input == null) {
+            return null;
+        }
+
         for (String inputEntry : input) {
             Matcher matcher = pattern.matcher(inputEntry);
             if (matcher.find()) {
@@ -33,6 +54,10 @@ public class RegexUtils {
     }
 
     public static boolean contains(String input, Pattern pattern) {
+        if (input == null) {
+            return false;
+        }
+
         return pattern.matcher(input).find();
     }
 }

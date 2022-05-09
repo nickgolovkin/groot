@@ -1,10 +1,12 @@
 package com.golovkin.acceptance.utils.git.log;
 
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,6 +30,8 @@ public class GitStubLogReader {
             List<String> lines = Files.readAllLines(logPath);
 
             return parseLines(lines);
+        } catch (NoSuchFileException e) {
+            return Collections.emptyList();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -5,6 +5,7 @@ import com.golovkin.config.ConfigurationReader;
 import com.golovkin.dialogs.AbstractDialog;
 import com.golovkin.dialogs.abort.AbortDialog;
 import com.golovkin.dialogs.checkout.CheckoutDialog;
+import com.golovkin.dialogs.commit.CommitDialog;
 import com.golovkin.dialogs.deletebranch.DeleteBranchDialog;
 import com.golovkin.dialogs.renamebranch.RenameBranchDialog;
 import com.golovkin.dialogs.resettocommit.ResetToCommitDialog;
@@ -14,6 +15,7 @@ import com.golovkin.dialogs.utils.DialogSearcher;
 import com.golovkin.dialogs.DialogInputParser;
 import com.golovkin.dialogs.newbranch.NewBranchDialog;
 import com.golovkin.git.Git;
+import com.golovkin.git.commands.commit.CommitGitCommand;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,6 +54,7 @@ public class App
         abstractDialogs.put(ResetToCommitDialog.class, new ResetToCommitDialog(git, configuration.getProjectEntries()));
         abstractDialogs.put(ShowChangesDialog.class, new ShowChangesDialog(git, configuration.getProjectEntries()));
         abstractDialogs.put(UnshowChangesDialog.class, new UnshowChangesDialog(git, configuration.getProjectEntries()));
+        abstractDialogs.put(CommitDialog.class, new CommitDialog(git, configuration.getProjectEntries(), configuration.getBranchNamePattern()));
 
         return abstractDialogs;
     }
