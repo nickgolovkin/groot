@@ -28,6 +28,7 @@ public class CommitDialog extends AbstractDialog<CommitDialogInput, CommitDialog
 
     public CommitDialog(Git git, List<ProjectEntry> projectEntries, String branchNamePattern) {
         super(git, projectEntries);
+        // TODO это кривота из-за которой может посыпаться NPE, перенести в start
         this.branchNamePattern = branchNamePattern == null ? null : Pattern.compile(branchNamePattern);
         this.taskNumberPattern = RegexUtils.extractFirstOccurrence(branchNamePattern, TASK_NUMBER_GROUP_PATTERN);
     }
@@ -64,11 +65,11 @@ public class CommitDialog extends AbstractDialog<CommitDialogInput, CommitDialog
                 CommitGitCommandOutput commandOutput = commitGitCommand.execute(commandInput);
 
                 if (commandOutput.isCannotGetTaskNumberFromBranchName()) {
-                    printf("[%s] Коммит [%s] успешно выполенен [%s] (не удалось определить номер таски из ветки, использовано сообщение коммита в исходном виде)", projectName, commandOutput.getResolvedCommitMessage(), branchName);
+                    printf("[%s] Коммит [%s] успешно выполнен [%s] (не удалось определить номер таски из ветки, использовано сообщение коммита в исходном виде)", projectName, commandOutput.getResolvedCommitMessage(), branchName);
                     LOGGER.warn("[{}] Коммит в ветке [{}]. Коммит успешно выполнен. Не удалось определить номер таски из ветки, использовано сообщение коммита в исходном виде. Сообщение - [{}]. Команды - [{}]", projectName, branchName, commandOutput.getResolvedCommitMessage(), getGit().getLastExecutedCommandsAsString());
                 } else {
                     printf("[%s] Коммит [%s] успешно выполнен [%s]", projectName, commandOutput.getResolvedCommitMessage(), branchName);
-                    LOGGER.info("[{}] Коммит в ветке [{}]. Коммит успешно выполенен. Сообщение - [{}]. Команды - [{}]", projectName, branchName, commandOutput.getResolvedCommitMessage(), getGit().getLastExecutedCommandsAsString());
+                    LOGGER.info("[{}] Коммит в ветке [{}]. Коммит успешно выполнен. Сообщение - [{}]. Команды - [{}]", projectName, branchName, commandOutput.getResolvedCommitMessage(), getGit().getLastExecutedCommandsAsString());
                 }
             } catch (TaskNumberFromBranchNameDoesNotMatchTaskNumberFromCommitMessageException e) {
                 printf(error("[%s] Номер таски в сообщении коммита [%s] не совпадает с номером таски в названии ветки [%s]"), projectName, e.getTaskNumberFromCommitMessage(), e.getTaskNumberFromBranchName());

@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CommitDialogInputParser implements DialogInputParser<CommitDialogInput> {
-    private static final Pattern INPUT_PATTERN = Pattern.compile("commit \"(?<message>.+)\"");
+    private static final Pattern INPUT_PATTERN = Pattern.compile("commit (?<message>.+)");
 
     public CommitDialogInput parse(String input) {
         Matcher matcher = INPUT_PATTERN.matcher(input);
