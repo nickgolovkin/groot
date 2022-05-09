@@ -37,6 +37,11 @@ public class Groot {
         return this;
     }
 
+    public Groot withBranchNamePattern(String branchNamePattern) {
+        grootConfigBuilder.withBranchNamePattern(branchNamePattern);
+        return this;
+    }
+
     public Groot withProjectEntry(String name, String directory, String repoUrl) {
         grootConfigBuilder.withProjectEntry(name, directory, repoUrl);
         return this;
