@@ -18,6 +18,8 @@ public class BitbucketAcceptanceTest extends AbstractAcceptanceTest {
         httpStub().add("/hello", "POST", Parameters.create("key=value"), "", 200, "OK")
                 .create();
 
+
+
         check().assertHttpRequestsEqual(
                 new HttpRequest("/hello", "POST", "")
         );
