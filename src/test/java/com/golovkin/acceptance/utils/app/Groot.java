@@ -37,6 +37,11 @@ public class Groot {
         return this;
     }
 
+    public Groot withBitbucketUrl(String bitbucketUrl) {
+        grootConfigBuilder.withBitbucketUrl(bitbucketUrl);
+        return this;
+    }
+
     public Groot withBranchNamePattern(String branchNamePattern) {
         grootConfigBuilder.withBranchNamePattern(branchNamePattern);
         return this;

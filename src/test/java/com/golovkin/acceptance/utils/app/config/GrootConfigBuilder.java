@@ -19,6 +19,7 @@ public class GrootConfigBuilder {
     private Path path;
 
     private String gitBackendPath;
+    private String bitbucketUrl;
     private String branchNamePattern;
     private List<ProjectEntry> projectEntries;
 
@@ -34,6 +35,11 @@ public class GrootConfigBuilder {
 
     public GrootConfigBuilder withGitBackendPath(String gitBackendPath) {
         this.gitBackendPath = gitBackendPath;
+        return this;
+    }
+
+    public GrootConfigBuilder withBitbucketUrl(String bitbucketUrl) {
+        this.bitbucketUrl = bitbucketUrl;
         return this;
     }
 
@@ -62,7 +68,7 @@ public class GrootConfigBuilder {
     }
 
     private void writeConfigToFile(Path configPath) throws IOException {
-        Configuration configuration = new Configuration(gitBackendPath, branchNamePattern, projectEntries);
+        Configuration configuration = new Configuration(gitBackendPath, bitbucketUrl, branchNamePattern, projectEntries);
 
         OBJECT_MAPPER.writeValue(configPath.toFile(), configuration);
     }

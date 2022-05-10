@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Configuration {
     private String gitBackendPath;
+    private String bitbucketUrl;
     private String branchNamePattern;
     private List<ProjectEntry> projectEntries;
 
@@ -15,14 +16,19 @@ public class Configuration {
     private Configuration() {
     }
 
-    public Configuration(String gitBackendPath, String branchNamePattern, List<ProjectEntry> projectEntries) {
+    public Configuration(String gitBackendPath, String bitbucketUrl, String branchNamePattern, List<ProjectEntry> projectEntries) {
         this.gitBackendPath = gitBackendPath;
+        this.bitbucketUrl = bitbucketUrl;
         this.branchNamePattern = branchNamePattern;
         this.projectEntries = projectEntries;
     }
 
     public Path getGitBackendPath() {
         return Paths.get(gitBackendPath);
+    }
+
+    public String getBitbucketUrl() {
+        return bitbucketUrl;
     }
 
     public String getBranchNamePattern() {
