@@ -17,9 +17,15 @@ import com.golovkin.dialogs.DialogInputParser;
 import com.golovkin.dialogs.newbranch.NewBranchDialog;
 import com.golovkin.git.Git;
 import com.golovkin.git.commands.commit.CommitGitCommand;
+import com.golovkin.git.exceptions.UnknownCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.golovkin.common.ColorUtils.error;
+import static com.golovkin.common.PrintUtils.printf;
 
 /**
  * Hello world!
@@ -27,6 +33,8 @@ import java.util.Map;
  */
 public class App 
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static void main( String[] args )
     {
@@ -38,9 +46,14 @@ public class App
         Map<Class<? extends AbstractDialog>, AbstractDialog> dialogs = getDialogs(git, configuration);
         DialogSearcher dialogSearcher = new DialogSearcher(dialogs);
 
-        AbstractDialog dialog = dialogSearcher.searchDialog(input);
-        DialogInputParser inputParser = dialog.getInputParser();
-        dialog.start(inputParser.parse(input));
+        try {
+            AbstractDialog dialog = dialogSearcher.searchDialog(input);
+            DialogInputParser inputParser = dialog.getInputParser();
+            dialog.start(inputParser.parse(input));
+        } catch (UnknownCommand e) {
+            printf(error("Не удалось обработать команду [%s]"), e.getCommand());
+            LOGGER.error("Не удалось обработать команду [{}]", e.getCommand());
+        }
     }
 
     @SuppressWarnings("rawtypes")

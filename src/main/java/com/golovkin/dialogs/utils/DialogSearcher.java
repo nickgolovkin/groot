@@ -1,6 +1,7 @@
 package com.golovkin.dialogs.utils;
 
 import com.golovkin.dialogs.AbstractDialog;
+import com.golovkin.git.exceptions.UnknownCommand;
 
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -20,6 +21,6 @@ public class DialogSearcher {
             }
         }
 
-        throw new IllegalArgumentException(String.format("Не удалось обработать команду [%s]", input));
+        throw new UnknownCommand(input);
     }
 }

@@ -46,6 +46,7 @@ public class CheckoutDialog extends AbstractDialog<CheckoutDialogInput, Checkout
                 printf("[%s] Переход в ветку [%s] успешно завершен", projectName, branchName);
 
                 if (commandOutput.isNothingToCommit()) {
+                    // TODO переделать обычный лог на "были несохраненные изменения", потому что это более редкий кейс, когда изменений не было и нам как раз его нужно отслеживать
                     LOGGER.info("[{}] Переход из ветки [{}] в ветку [{}]. Переход в ветку [{}] успешно завершен (несохраненных изменений не было). Команды - [{}]",
                             projectName, currentBranchName, branchName, branchName, getGit().getLastExecutedCommandsAsString());
                 } else {
