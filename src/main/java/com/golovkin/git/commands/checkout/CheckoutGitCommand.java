@@ -3,6 +3,7 @@ package com.golovkin.git.commands.checkout;
 import com.golovkin.git.Git;
 import com.golovkin.git.commands.AbstractGitCommand;
 import com.golovkin.git.exceptions.NothingToCommitException;
+import com.golovkin.git.exceptions.RefNotExistsException;
 
 import java.util.List;
 
@@ -24,7 +25,12 @@ public class CheckoutGitCommand extends AbstractGitCommand<CheckoutGitCommandInp
         boolean isNothingToCommit = false;
         // TODO посмотреть на токенизацию и как она здесь отработает в GitExec
         // Попробовать потом как-нибудь реализовать null-безопасность на аннотациях
-        getGit().verifyRefExists(projectDirectoryPath, name);
+        try {
+            getGit().verifyRefExists(projectDirectoryPath, name);
+        } catch (RefNotExistsException e) {
+            String nameFromRemote = String.format("origin/%s", name);
+            getGit().verifyRefExists(projectDirectoryPath, nameFromRemote);
+        }
 
         try {
             getGit().commit(projectDirectoryPath, CHECKPOINT_COMMIT_MESSAGE, false);
